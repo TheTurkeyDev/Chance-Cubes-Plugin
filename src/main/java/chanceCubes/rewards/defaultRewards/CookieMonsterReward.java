@@ -13,52 +13,44 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class CookieMonsterReward implements IChanceCubeReward
-{
+public class CookieMonsterReward implements IChanceCubeReward {
 
-	@Override
-	public void trigger(final World world, final BlockPos pos, final EntityPlayer player)
-	{
-		if(!world.isRemote)
-		{
-			RewardsUtil.sendMessageToNearPlayers(world, pos, 32, "Here have some cookies!");
-			Entity itemEnt = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(Items.COOKIE, 8));
-			world.spawnEntityInWorld(itemEnt);
+    @Override
+    public int getChanceValue() {
+        return -5;
+    }
 
-			Task task = new Task("Cookie Monster", 30)
-			{
-				@Override
-				public void callback()
-				{
-					SpawnCM();
-				}
+    @Override
+    public String getName() {
+        return CCubesCore.instance().getName().toLowerCase() + ":Cookie_Monster";
+    }
 
-				private void SpawnCM()
-				{
-					EntityZombie cm = new EntityZombie(world);
-					cm.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-					cm.setChild(true);
-					cm.setCustomNameTag("Cookie Monster");
-					RewardsUtil.sendMessageToNearPlayers(world, pos, 32, "[Cookie Monster] Hey! Those are mine!");
-					world.spawnEntityInWorld(cm);
-				}
+    @Override
+    public void trigger(final Location location, final final Player player) {
+        if (!world.isRemote) {
+            RewardsUtil.sendMessageToNearPlayers(world, pos, 32, "Here have some cookies!");
+            Entity itemEnt = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(Items.COOKIE, 8));
+            world.spawnEntityInWorld(itemEnt);
 
-			};
+            Task task = new Task("Cookie Monster", 30) {
+                private void SpawnCM() {
+                    EntityZombie cm = new EntityZombie(world);
+                    cm.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+                    cm.setChild(true);
+                    cm.setCustomNameTag("Cookie Monster");
+                    RewardsUtil.sendMessageToNearPlayers(world, pos, 32, "[Cookie Monster] Hey! Those are mine!");
+                    world.spawnEntityInWorld(cm);
+                }
 
-			Scheduler.scheduleTask(task);
-		}
+                @Override
+                public void callback() {
+                    SpawnCM();
+                }
 
-	}
+            };
 
-	@Override
-	public int getChanceValue()
-	{
-		return -5;
-	}
+            Scheduler.scheduleTask(task);
+        }
 
-	@Override
-	public String getName()
-	{
-		return CCubesCore.MODID + ":Cookie_Monster";
-	}
+    }
 }

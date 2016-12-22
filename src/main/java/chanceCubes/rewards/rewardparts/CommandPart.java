@@ -3,51 +3,45 @@ package chanceCubes.rewards.rewardparts;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 
-public class CommandPart
-{
-	public static String[] elements = new String[]{"item:I", "chance:I", "meta:I", "amountMin:I", "amountMax:I"};
-	
-	private String command;
+public class CommandPart {
 
-	private int delay = 0;
+    public static String[] elements = new String[]{"item:I", "chance:I", "meta:I", "amountMin:I", "amountMax:I"};
 
-	public CommandPart(String command)
-	{
-		this.command = command;
-	}
-	
-	public CommandPart(String command, int delay)
-	{
-		this.command = command;
-		this.delay = delay;
-	}
+    private String command;
 
-	public String getRawCommand()
-	{
-		return command;
-	}
+    private int delay = 0;
 
-	public int getDelay()
-	{
-		return delay;
-	}
+    public CommandPart(String command) {
+        this.command = command;
+    }
 
-	public void setDelay(int delay)
-	{
-		this.delay = delay;
-	}
+    public CommandPart(String command, int delay) {
+        this.command = command;
+        this.delay = delay;
+    }
 
-	public String getParsedCommand(World world, int x, int y, int z, EntityPlayer player)
-	{
-		String parsedCommand = command;
-		parsedCommand = parsedCommand.replace("%player", player.getCommandSenderEntity().getName());
-		parsedCommand = parsedCommand.replace("%x", "" + x);
-		parsedCommand = parsedCommand.replace("%y", "" + y);
-		parsedCommand = parsedCommand.replace("%z", "" + z);
-		parsedCommand = parsedCommand.replace("%px", "" + player.posX);
-		parsedCommand = parsedCommand.replace("%py", "" + player.posY);
-		parsedCommand = parsedCommand.replace("%pz", "" + player.posZ);
+    public int getDelay() {
+        return delay;
+    }
 
-		return parsedCommand;
-	}
+    public void setDelay(int delay) {
+        this.delay = delay;
+    }
+
+    public String getParsedCommand(World world, int x, int y, int z, EntityPlayer player) {
+        String parsedCommand = command;
+        parsedCommand = parsedCommand.replace("%player", player.getCommandSenderEntity().getName());
+        parsedCommand = parsedCommand.replace("%x", "" + x);
+        parsedCommand = parsedCommand.replace("%y", "" + y);
+        parsedCommand = parsedCommand.replace("%z", "" + z);
+        parsedCommand = parsedCommand.replace("%px", "" + player.posX);
+        parsedCommand = parsedCommand.replace("%py", "" + player.posY);
+        parsedCommand = parsedCommand.replace("%pz", "" + player.posZ);
+
+        return parsedCommand;
+    }
+
+    public String getRawCommand() {
+        return command;
+    }
 }

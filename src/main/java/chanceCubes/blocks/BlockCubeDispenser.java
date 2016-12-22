@@ -1,8 +1,7 @@
 package chanceCubes.blocks;
 
-import java.util.Random;
-
 import chanceCubes.tileentities.TileCubeDispenser;
+import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.properties.IProperty;
@@ -23,162 +22,137 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class BlockCubeDispenser extends BaseChanceBlock implements ITileEntityProvider
-{
-	public static final PropertyEnum<BlockCubeDispenser.DispenseType> DISPENSING = PropertyEnum.<BlockCubeDispenser.DispenseType> create("dispensing", BlockCubeDispenser.DispenseType.class);
+public class BlockCubeDispenser extends BaseChanceBlock implements ITileEntityProvider {
+    //TODO need to convert to a GUI
+    public static final PropertyEnum<BlockCubeDispenser.DispenseType> DISPENSING = PropertyEnum.<BlockCubeDispenser.DispenseType>create("dispensing", BlockCubeDispenser.DispenseType.class);
 
-	public BlockCubeDispenser()
-	{
-		super("cube_Dispenser");
-		this.setHardness(2f);
-		this.setDefaultState(this.blockState.getBaseState().withProperty(DISPENSING, DispenseType.CHANCE_CUBE));
-		this.setLightOpacity(0);
-	}
+    public BlockCubeDispenser() {
+        super("cube_Dispenser");
+        this.setHardness(2f);
+        this.setDefaultState(this.blockState.getBaseState().withProperty(DISPENSING, DispenseType.CHANCE_CUBE));
+        this.setLightOpacity(0);
+    }
 
-	@Override
-	public TileEntity createNewTileEntity(World world, int meta)
-	{
-		return new TileCubeDispenser();
-	}
+    public static DispenseType getCurrentState(IBlockState state) {
+        return state.getValue(DISPENSING);
+    }
 
-	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
-	{
-		if(!(world.getTileEntity(pos) instanceof TileCubeDispenser))
-			return false;
+    public static DispenseType getNextState(IBlockState state) {
+        return state.getValue(DISPENSING).getNextState();
+    }
 
-		TileCubeDispenser te = (TileCubeDispenser) world.getTileEntity(pos);
-		if(player.isSneaking())
-		{
-			world.setBlockState(pos, this.getDefaultState().withProperty(DISPENSING, BlockCubeDispenser.getNextState(state)));
-		}
-		else
-		{
-			if(player.inventory.getCurrentItem() != null)
-			{
-				Block block = Block.getBlockFromItem(player.inventory.getCurrentItem().getItem());
-				if(block != null && block.equals(te.getCurrentBlock(BlockCubeDispenser.getCurrentState(state))))
-				{
-					player.inventory.decrStackSize(player.inventory.currentItem, 1);
-				}
-			}
-		}
-		return true;
-	}
+    @Override
+    public boolean canDropFromExplosion(Explosion explosion) {
+        return false;
+    }
 
-	public void onBlockClicked(World world, BlockPos pos, EntityPlayer player)
-	{
-		if(world.isRemote)
-			return;
-		if(!(world.getTileEntity(pos) instanceof TileCubeDispenser))
-			return;
-		TileCubeDispenser te = (TileCubeDispenser) world.getTileEntity(pos);
+    @Override
+    public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos, Entity entity) {
+        return false;
+    }
 
-		double px = player.posX;
-		double py = player.posY;
-		double pz = player.posZ;
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, new IProperty[]{DISPENSING});
+    }
 
-		EntityItem entitem = te.getNewEntityItem(BlockCubeDispenser.getCurrentState(world.getBlockState(pos)));
-		entitem.setLocationAndAngles(px, py, pz, 0, 0);
-		if(player.isSneaking())
-		{
-			entitem.getEntityItem().stackSize = 1;
-			world.spawnEntityInWorld(entitem);
-		}
-		else
-		{
-			entitem.getEntityItem().stackSize = 64;
-			world.spawnEntityInWorld(entitem);
-		}
-	}
+    @Override
+    public TileEntity createNewTileEntity(World world, int meta) {
+        return new TileCubeDispenser();
+    }
 
-	public boolean isOpaqueCube()
-	{
-		return false;
-	}
+    public Item getItemDropped(int p_149650_1_, Random p_149650_2_, int p_149650_3_) {
+        return null;
+    }
 
-	@Override
-	public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos, Entity entity)
-	{
-		return false;
-	}
+    public int getMetaFromState(IBlockState state) {
+        return 0;
+    }
 
-	@Override
-	public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn)
-	{
+    public boolean isOpaqueCube() {
+        return false;
+    }
 
-	}
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (!(world.getTileEntity(pos) instanceof TileCubeDispenser))
+            return false;
 
-	@Override
-	public boolean canDropFromExplosion(Explosion explosion)
-	{
-		return false;
-	}
+        TileCubeDispenser te = (TileCubeDispenser) world.getTileEntity(pos);
+        if (player.isSneaking()) {
+            world.setBlockState(pos, this.getDefaultState().withProperty(DISPENSING, BlockCubeDispenser.getNextState(state)));
+        }
+        else {
+            if (player.inventory.getCurrentItem() != null) {
+                Block block = Block.getBlockFromItem(player.inventory.getCurrentItem().getItem());
+                if (block != null && block.equals(te.getCurrentBlock(BlockCubeDispenser.getCurrentState(state)))) {
+                    player.inventory.decrStackSize(player.inventory.currentItem, 1);
+                }
+            }
+        }
+        return true;
+    }
 
-	public Item getItemDropped(int p_149650_1_, Random p_149650_2_, int p_149650_3_)
-	{
-		return null;
-	}
+    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
+        if (world.isRemote)
+            return;
+        if (!(world.getTileEntity(pos) instanceof TileCubeDispenser))
+            return;
+        TileCubeDispenser te = (TileCubeDispenser) world.getTileEntity(pos);
 
-	/**
-	 * Returns the quantity of items to drop on block destruction.
-	 */
-	public int quantityDropped(Random p_149745_1_)
-	{
-		return 0;
-	}
+        double px = player.posX;
+        double py = player.posY;
+        double pz = player.posZ;
 
-	public int getMetaFromState(IBlockState state)
-	{
-		return 0;
-	}
+        EntityItem entitem = te.getNewEntityItem(BlockCubeDispenser.getCurrentState(world.getBlockState(pos)));
+        entitem.setLocationAndAngles(px, py, pz, 0, 0);
+        if (player.isSneaking()) {
+            entitem.getEntityItem().stackSize = 1;
+            world.spawnEntityInWorld(entitem);
+        }
+        else {
+            entitem.getEntityItem().stackSize = 64;
+            world.spawnEntityInWorld(entitem);
+        }
+    }
 
-	public static enum DispenseType implements IStringSerializable
-	{
-		CHANCE_CUBE("chance_cube"), CHANCE_ICOSAHEDRON("chance_icosahedron"), COMPACT_GAINTCUBE("compact_gaint_cube");
+    @Override
+    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {
 
-		private String type;
+    }
 
-		private DispenseType(String name)
-		{
-			this.type = name;
-		}
+    /**
+     * Returns the quantity of items to drop on block destruction.
+     */
+    public int quantityDropped(Random p_149745_1_) {
+        return 0;
+    }
 
-		@Override
-		public String getName()
-		{
-			return this.type;
-		}
+    public static enum DispenseType implements IStringSerializable {
+        CHANCE_CUBE("chance_cube"), CHANCE_ICOSAHEDRON("chance_icosahedron"), COMPACT_GAINTCUBE("compact_gaint_cube");
 
-		public DispenseType getNextState()
-		{
-			switch(this)
-			{
-				case CHANCE_CUBE:
-					return CHANCE_ICOSAHEDRON;
-				case CHANCE_ICOSAHEDRON:
-					return COMPACT_GAINTCUBE;
-				case COMPACT_GAINTCUBE:
-					return CHANCE_CUBE;
-				default:
-					return CHANCE_CUBE;
+        private String type;
 
-			}
-		}
-	}
+        private DispenseType(String name) {
+            this.type = name;
+        }
 
-	public static DispenseType getNextState(IBlockState state)
-	{
-		return state.getValue(DISPENSING).getNextState();
-	}
+        @Override
+        public String getName() {
+            return this.type;
+        }
 
-	public static DispenseType getCurrentState(IBlockState state)
-	{
-		return state.getValue(DISPENSING);
-	}
+        public DispenseType getNextState() {
+            switch (this) {
+                case CHANCE_CUBE:
+                    return CHANCE_ICOSAHEDRON;
+                case CHANCE_ICOSAHEDRON:
+                    return COMPACT_GAINTCUBE;
+                case COMPACT_GAINTCUBE:
+                    return CHANCE_CUBE;
+                default:
+                    return CHANCE_CUBE;
 
-	protected BlockStateContainer createBlockState()
-	{
-		return new BlockStateContainer(this, new IProperty[] { DISPENSING });
-	}
+            }
+        }
+    }
 }

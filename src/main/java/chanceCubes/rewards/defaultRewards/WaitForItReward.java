@@ -1,71 +1,61 @@
 package chanceCubes.rewards.defaultRewards;
 
-import java.util.Random;
-
 import chanceCubes.CCubesCore;
 import chanceCubes.util.Scheduler;
 import chanceCubes.util.Task;
+import java.util.Random;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
-public class WaitForItReward implements IChanceCubeReward
-{
-	private final Random rand = new Random();
+public class WaitForItReward implements IChanceCubeReward {
 
-	@Override
-	public void trigger(final World world, BlockPos pos, final EntityPlayer player)
-	{
-		player.addChatMessage(new TextComponentString("Wait for it......."));
+    private final Random rand = new Random();
 
-		Task task = new Task("Wait For It", rand.nextInt(4000) + 1000)
-		{
-			@Override
-			public void callback()
-			{
-				triggerRealReward();
-			}
+    @Override
+    public int getChanceValue() {
+        return -30;
+    }
 
-			private void triggerRealReward()
-			{
-				int reward = rand.nextInt(3);
-				player.addChatMessage(new TextComponentString("NOW!"));
+    @Override
+    public String getName() {
+        return CCubesCore.instance().getName().toLowerCase() + ":Wait_For_It";
+    }
 
-				if(reward == 0)
-				{
-					world.spawnEntityInWorld(new EntityTNTPrimed(world, player.posX, player.posY, player.posZ, null));
-				}
-				else if(reward == 1)
-				{
-					Entity ent = new EntityCreeper(world);
-					ent.setLocationAndAngles(player.posX, player.posY, player.posZ, 0, 0);
-					world.spawnEntityInWorld(ent);
-				}
-				else if(reward == 2)
-				{
-					world.setBlockState(new BlockPos(player.posX, player.posY, player.posZ), Blocks.BEDROCK.getDefaultState());
-				}
-			}
-		};
+    @Override
+    public void trigger(final Location location, final Player player) {
+        player.addChatMessage(new TextComponentString("Wait for it......."));
 
-		Scheduler.scheduleTask(task);
-	}
+        Task task = new Task("Wait For It", rand.nextInt(4000) + 1000) {
+            @Override
+            public void callback() {
+                triggerRealReward();
+            }
 
-	@Override
-	public int getChanceValue()
-	{
-		return -30;
-	}
+            private void triggerRealReward() {
+                int reward = rand.nextInt(3);
+                player.addChatMessage(new TextComponentString("NOW!"));
 
-	@Override
-	public String getName()
-	{
-		return CCubesCore.MODID + ":Wait_For_It";
-	}
+                if (reward == 0) {
+                    world.spawnEntityInWorld(new EntityTNTPrimed(world, player.posX, player.posY, player.posZ, null));
+                }
+                else if (reward == 1) {
+                    Entity ent = new EntityCreeper(world);
+                    ent.setLocationAndAngles(player.posX, player.posY, player.posZ, 0, 0);
+                    world.spawnEntityInWorld(ent);
+                }
+                else if (reward == 2) {
+                    world.setBlockState(new BlockPos(player.posX, player.posY, player.posZ), Blocks.BEDROCK.getDefaultState());
+                }
+            }
+        };
+
+        Scheduler.scheduleTask(task);
+    }
 
 }

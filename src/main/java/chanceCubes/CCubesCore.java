@@ -1,12 +1,5 @@
 package chanceCubes;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
-
-import chanceCubes.blocks.CCubesBlocks;
-import chanceCubes.client.gui.CCubesGuiHandler;
-import chanceCubes.client.listeners.WorldRenderListener;
-import chanceCubes.commands.CCubesClientCommands;
 import chanceCubes.commands.CCubesServerCommands;
 import chanceCubes.config.CCubesSettings;
 import chanceCubes.config.ConfigLoader;
@@ -14,124 +7,75 @@ import chanceCubes.config.CustomRewardsLoader;
 import chanceCubes.hookins.ModHookUtil;
 import chanceCubes.items.CCubesItems;
 import chanceCubes.listeners.PlayerConnectListener;
-import chanceCubes.listeners.TickListener;
 import chanceCubes.listeners.WorldGen;
-import chanceCubes.network.CCubesPacketHandler;
-import chanceCubes.proxy.CommonProxy;
 import chanceCubes.registry.ChanceCubeRegistry;
 import chanceCubes.registry.GiantCubeRegistry;
-import chanceCubes.sounds.CCubesSounds;
-import chanceCubes.util.CCubesAchievements;
-import chanceCubes.util.CCubesRecipies;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.relauncher.Side;
+import chanceCubes.util.CCubesRecipes;
+import org.bukkit.plugin.java.JavaPlugin;
 
-@Mod(modid = CCubesCore.MODID, version = CCubesCore.VERSION, name = CCubesCore.NAME, guiFactory = "chanceCubes.config.ConfigGuiFactory", dependencies = "required-after:Forge@[12.18.2.2099,)")
-public class CCubesCore
-{
-	public static final String MODID = "chancecubes";
-	public static final String VERSION = "@VERSION@";
-	public static final String NAME = "Chance Cubes";
+public class CCubesCore extends JavaPlugin {
 
-	public static final String gameVersion = "1.10.2";
+    public static final String gameVersion = "1.10.2";
 
-	@Instance(value = MODID)
-	public static CCubesCore instance;
-	@SidedProxy(clientSide = "chanceCubes.proxy.ClientProxy", serverSide = "chanceCubes.proxy.CommonProxy")
-	public static CommonProxy proxy;
-	public static CreativeTabs modTab = new CreativeTabs(MODID)
-	{
-		public Item getTabIconItem()
-		{
-			return Item.getItemFromBlock(CCubesBlocks.CHANCE_CUBE);
-		}
-	};
-	public static Logger logger;
+    @Override
+    public void onEnable() {
+        //Load
+        ConfigLoader.loadConfigSettings();
 
-	@EventHandler
-	public void init(FMLInitializationEvent event)
-	{
-		CCubesRecipies.loadRecipies();
-		CCubesSounds.loadSounds();
+        //TODO custom blocks not possible w/o client mods
+        //CCubesBlocks.loadBlocks();
+        CCubesItems.loadItems();
+        //TODO Code for Packet Handling being moved to server only
+        //CCubesPacketHandler.init();
+        //TODO May keep these as custom Achievements
+        //CCubesAchievements.loadAchievements();
 
-		if(event.getSide() == Side.CLIENT)
-		{
-			CCubesItems.registerItems();
-			CCubesBlocks.registerBlocksItems();
-		}
+        getServer().getPluginManager().registerEvents(new PlayerConnectListener(), this);
+        getServer().getPluginManager().registerEvents(new WorldGen(), this);
 
-		proxy.registerRenderings();
-	}
+        if (CCubesSettings.chestLoot) {
+            // ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceCube), 1, 2, 5));
+            // ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceIcosahedron), 1, 2, 5));
+            // ChestGenHooks.getInfo(ChestGenHooks.MINESHAFT_CORRIDOR).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceCube), 1, 2, 5));
+            // ChestGenHooks.getInfo(ChestGenHooks.MINESHAFT_CORRIDOR).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceIcosahedron), 1, 2, 5));
+            // ChestGenHooks.getInfo(ChestGenHooks.STRONGHOLD_CORRIDOR).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceCube), 1, 2, 5));
+            // ChestGenHooks.getInfo(ChestGenHooks.STRONGHOLD_CORRIDOR).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceIcosahedron), 1, 2, 5));
+            // ChestGenHooks.getInfo(ChestGenHooks.VILLAGE_BLACKSMITH).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceCube), 1, 2, 5));
+            // ChestGenHooks.getInfo(ChestGenHooks.VILLAGE_BLACKSMITH).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceIcosahedron), 1, 2, 5));
+        }
 
-	@EventHandler
-	public void load(FMLPreInitializationEvent event)
-	{
-		logger = event.getModLog();
-		ConfigLoader.loadConfigSettings(event.getSuggestedConfigurationFile());
+        //TODO convert to server sided gui
+        //NetworkRegistry.INSTANCE.registerGuiHandler(this, new CCubesGuiHandler());
 
-		CCubesBlocks.loadBlocks();
-		CCubesItems.loadItems();
-		CCubesPacketHandler.init();
-		CCubesAchievements.loadAchievements();
-		proxy.registerEvents();
+        //Init
+        CCubesRecipes.loadRecipes();
+        //TODO client side only
+        //CCubesSounds.loadSounds();
 
-		MinecraftForge.EVENT_BUS.register(new PlayerConnectListener());
-		MinecraftForge.EVENT_BUS.register(new TickListener());
-		MinecraftForge.EVENT_BUS.register(new WorldGen());
-		MinecraftForge.EVENT_BUS.register(new WorldRenderListener());
+        CCubesItems.registerItems();
+        //TODO custom blocks not possible w/o client mods
+        //CCubesBlocks.registerBlocksItems();
 
-		if(CCubesSettings.chestLoot)
-		{
-			// ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceCube), 1, 2, 5));
-			// ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceIcosahedron), 1, 2, 5));
-			// ChestGenHooks.getInfo(ChestGenHooks.MINESHAFT_CORRIDOR).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceCube), 1, 2, 5));
-			// ChestGenHooks.getInfo(ChestGenHooks.MINESHAFT_CORRIDOR).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceIcosahedron), 1, 2, 5));
-			// ChestGenHooks.getInfo(ChestGenHooks.STRONGHOLD_CORRIDOR).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceCube), 1, 2, 5));
-			// ChestGenHooks.getInfo(ChestGenHooks.STRONGHOLD_CORRIDOR).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceIcosahedron), 1, 2, 5));
-			// ChestGenHooks.getInfo(ChestGenHooks.VILLAGE_BLACKSMITH).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceCube), 1, 2, 5));
-			// ChestGenHooks.getInfo(ChestGenHooks.VILLAGE_BLACKSMITH).addItem(new WeightedRandomChestContent(new ItemStack(CCubesBlocks.chanceIcosahedron), 1, 2, 5));
-		}
+        //TODO rendering is client sided
+        //proxy.registerRenderings();
 
-		NetworkRegistry.INSTANCE.registerGuiHandler(this, new CCubesGuiHandler());
-	}
+        //Post Init
+        ChanceCubeRegistry.loadDefaultRewards();
+        GiantCubeRegistry.loadDefaultRewards();
+        CustomRewardsLoader.instance.loadCustomRewards();
+        CustomRewardsLoader.instance.loadHolidayRewards();
+        CustomRewardsLoader.instance.loadDisabledRewards();
 
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event)
-	{
-		ChanceCubeRegistry.loadDefaultRewards();
-		GiantCubeRegistry.loadDefaultRewards();
-		CustomRewardsLoader.instance.loadCustomRewards();
-		CustomRewardsLoader.instance.loadHolidayRewards();
-		CustomRewardsLoader.instance.loadDisabledRewards();
-		ConfigLoader.config.save();
-	}
+        //Server Load
+        ModHookUtil.loadCustomModRewards();
+        getCommand(getId()).setExecutor(new CCubesServerCommands());
+    }
 
-	@EventHandler
-	public void serverLoad(FMLServerStartingEvent event)
-	{
-		ModHookUtil.loadCustomModRewards();
+    public static CCubesCore instance() {
+        return getPlugin(CCubesCore.class);
+    }
 
-		if(event.getSide().isClient())
-		{
-			CCubesCore.logger.log(Level.INFO, "Client-side commands loaded");
-			ClientCommandHandler.instance.registerCommand(new CCubesClientCommands());
-		}
-		else if(event.getSide().isServer())
-		{
-			CCubesCore.logger.log(Level.INFO, "Server-side commands loaded");
-			event.registerServerCommand(new CCubesServerCommands());
-		}
-	}
+    public String getId() {
+        return getName().toLowerCase();
+    }
 }

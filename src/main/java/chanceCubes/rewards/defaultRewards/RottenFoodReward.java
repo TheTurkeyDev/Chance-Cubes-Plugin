@@ -9,32 +9,28 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
-public class RottenFoodReward implements IChanceCubeReward
-{
-	@Override
-	public void trigger(World world, BlockPos pos, EntityPlayer player)
-	{
-		for(int i = 0; i < player.inventory.mainInventory.length; i++)
-		{
-			ItemStack stack = player.inventory.mainInventory[i];
-			if(stack != null && stack.getItem() instanceof ItemFood)
-				player.inventory.mainInventory[i] = new ItemStack(Items.ROTTEN_FLESH, stack.stackSize);
-		}
+public class RottenFoodReward implements IChanceCubeReward {
 
-		player.addChatMessage(new TextComponentString("Ewwww it's all rotten"));
+    @Override
+    public int getChanceValue() {
+        return -30;
+    }
 
-	}
+    @Override
+    public String getName() {
+        return CCubesCore.instance().getName().toLowerCase() + ":Rotten_Food";
+    }
 
-	@Override
-	public int getChanceValue()
-	{
-		return -30;
-	}
+    @Override
+    public void trigger(Location location, Player player) {
+        for (int i = 0; i < player.inventory.mainInventory.length; i++) {
+            ItemStack stack = player.inventory.mainInventory[i];
+            if (stack != null && stack.getItem() instanceof ItemFood)
+                player.inventory.mainInventory[i] = new ItemStack(Items.ROTTEN_FLESH, stack.stackSize);
+        }
 
-	@Override
-	public String getName()
-	{
-		return CCubesCore.MODID + ":Rotten_Food";
-	}
+        player.addChatMessage(new TextComponentString("Ewwww it's all rotten"));
+
+    }
 
 }

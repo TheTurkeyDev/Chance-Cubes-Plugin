@@ -1,66 +1,80 @@
 package chanceCubes.listeners;
 
-import java.util.Random;
-
-import chanceCubes.blocks.CCubesBlocks;
+import chanceCubes.CCubesCore;
 import chanceCubes.config.CCubesSettings;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.feature.WorldGenMinable;
-import net.minecraftforge.event.terraingen.PopulateChunkEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import chanceCubes.items.CCubesItems;
+import java.util.Random;
+import net.minecraft.server.v1_10_R1.BlockPosition;
+import net.minecraft.server.v1_10_R1.Blocks;
+import net.minecraft.server.v1_10_R1.WorldGenMinable;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.generator.BlockPopulator;
+import org.bukkit.metadata.FixedMetadataValue;
 
-public class WorldGen
-{
-	@SubscribeEvent
-	public void onGenerate(PopulateChunkEvent.Pre event)
-	{
-		if(CCubesSettings.isBlockedWorld(event.getWorld().getWorldInfo().getWorldName()) || CCubesSettings.isBlockedWorld("" + event.getWorld().provider.getDimension()))
-			return;
-		if(CCubesSettings.oreGeneration)
-			generateOre(event.getWorld(), new Random(), event.getChunkX() * 16, event.getChunkZ() * 16);
+public class WorldGen implements Listener {
 
-		if(CCubesSettings.surfaceGeneration)
-			generateSurface(event.getWorld(), new Random(), event.getChunkX() * 16, event.getChunkZ() * 16);
-	}
+    //TODO left off here. looking into block population
+    @EventHandler
+    public void onGenerate(WorldInitEvent event) {
+        World world = event.getWorld();
+        if (CCubesSettings.isBlockedWorld(world.getName()))
+            return;
 
-	private void generateOre(World world, Random rand, int x, int z)
-	{
-		for(int k = 0; k < CCubesSettings.oreGenAmount; k++)
-		{
-			int firstBlockXCoord = x + rand.nextInt(16);
-			int firstBlockYCoord = rand.nextInt(100);
-			int firstBlockZCoord = z + rand.nextInt(16);
+        if (CCubesSettings.surfaceGeneration)
+            world.getPopulators().add(new SurfaceGenerator());
 
-			(new WorldGenMinable(CCubesBlocks.CHANCE_CUBE.getDefaultState(), 3)).generate(world, rand, new BlockPos(firstBlockXCoord, firstBlockYCoord, firstBlockZCoord));
-		}
-	}
+        if (CCubesSettings.oreGeneration)
+            world.getPopulators().add(new OreGenerator());
+    }
 
-	public void generateSurface(World world, Random rand, int x, int z)
-	{
-		if(rand.nextInt(100) < CCubesSettings.surfaceGenAmount)
-		{
-			int xCord = x + rand.nextInt(16);
-			int zCord = z + rand.nextInt(16);
-			int yCord = world.getTopSolidOrLiquidBlock(new BlockPos(x, 0, z)).getY();
+    private static class OreGenerator extends BlockPopulator {
 
-			BlockPos pos = new BlockPos(xCord, yCord - 1, zCord);
-			
-			if(world.getBlockState(pos).getBlock().equals(Blocks.BEDROCK))
-			{
-				for(int y = 0; y < yCord; y++)
-				{
-					BlockPos pos2 = new BlockPos(xCord, y, zCord);
-					if(world.getBlockState(pos).getBlock().isBlockSolid(world, pos2, EnumFacing.UP) && world.isAirBlock(pos2))
-					{
-						yCord = y;
-						return;
-					}
-				}
-			}
-			world.setBlockState(new BlockPos(xCord, yCord, zCord), CCubesBlocks.CHANCE_CUBE.getDefaultState());
-		}
-	}
+        @Override
+        public void populate(World world, Random random, Chunk source) {
+            for (int k = 0; k < CCubesSettings.oreGenAmount; k++) {
+                int firstBlockXCoord = source.getX() + random.nextInt(16);
+                int firstBlockYCoord = random.nextInt(100);
+                int firstBlockZCoord = source.getZ() + random.nextInt(16);
+                //TODO would prefer to avoid NMS but can't find a way to do it in a simple way
+                (new WorldGenMinable(Blocks.GOLD_BLOCK.getBlockData(), 3)).generate(((CraftWorld) world).getHandle(), random, new BlockPosition(firstBlockXCoord, firstBlockYCoord, firstBlockZCoord));
+            }
+        }
+    }
+
+    private static class SurfaceGenerator extends BlockPopulator {
+
+        @Override
+        public void populate(World world, Random random, Chunk source) {
+            if (random.nextInt(100) < CCubesSettings.surfaceGenAmount) {
+                int x = source.getX() + random.nextInt(16);
+                int z = source.getZ() + random.nextInt(16);
+                int y = world.getHighestBlockYAt(x, z);
+
+                Location location = new Location(world, x, y - 1, z);
+                if (world.getBlockAt(location).getType() == Material.BEDROCK) {
+                    for (int yLoop = 0; yLoop < y; yLoop++) {
+                        Location loc = new Location(world, x, yLoop, z);
+                        if (world.getBlockAt(loc).getType().isSolid() && world.getBlockAt(location.clone().add(0, 1, 0)).getType() == Material.AIR) {
+                            y = yLoop;
+                            break;
+                        }
+                    }
+                }
+
+                BlockState state = world.getBlockAt(new Location(world, x, y, z)).getState();
+                state.setType(CCubesItems.chanceCube.getType());
+                //TODO need this to possibly return another volume
+                state.setMetadata("ChanceCubes", new FixedMetadataValue(CCubesCore.instance(), "Test"));
+                state.update(true);
+            }
+        }
+    }
 }

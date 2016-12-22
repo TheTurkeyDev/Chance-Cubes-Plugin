@@ -1,17 +1,5 @@
 package chanceCubes.registry;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
-import org.apache.logging.log4j.Level;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import chanceCubes.CCubesCore;
 import chanceCubes.config.CCubesSettings;
 import chanceCubes.config.ConfigLoader;
@@ -31,97 +19,96 @@ import chanceCubes.rewards.type.SchematicRewardType;
 import chanceCubes.util.FileUtil;
 import chanceCubes.util.RewardData;
 import chanceCubes.util.SchematicUtil;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Nullable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.apache.logging.log4j.Level;
 
-public class GiantCubeRegistry implements IRewardRegistry
-{
-	public static GiantCubeRegistry INSTANCE = new GiantCubeRegistry();
+public class GiantCubeRegistry implements IRewardRegistry {
 
-	private Map<String, IChanceCubeReward> nameToReward = Maps.newHashMap();
-	private List<IChanceCubeReward> sortedRewards = Lists.newArrayList();
+    public static GiantCubeRegistry INSTANCE = new GiantCubeRegistry();
 
-	/**
-	 * loads the default rewards of the Chance Cube
-	 */
-	public static void loadDefaultRewards()
-	{
-		if(!CCubesSettings.enableHardCodedRewards)
-			return;
+    private Map<String, IChanceCubeReward> nameToReward = Maps.newHashMap();
+    private List<IChanceCubeReward> sortedRewards = Lists.newArrayList();
 
-		INSTANCE.registerReward(new BasicReward(CCubesCore.MODID + ":Village", 0, new SchematicRewardType(SchematicUtil.loadCustomSchematic(FileUtil.JSON_PARSER.parse(RewardData.VILLAGE_SCHEMATIC), 0, -1, 0, 0.05f, false, false, false))));
-		
-		INSTANCE.registerReward(new BioDomeReward());
-		INSTANCE.registerReward(new TNTSlingReward());
-		INSTANCE.registerReward(new ThrowablesReward());
-		INSTANCE.registerReward(new OrePillarReward());
-		INSTANCE.registerReward(new ChunkReverserReward());
-		INSTANCE.registerReward(new FloorIsLavaReward());
-		INSTANCE.registerReward(new ChunkFlipReward());
-		INSTANCE.registerReward(new OreSphereReward());
-		INSTANCE.registerReward(new PotionsReward());
-		INSTANCE.registerReward(new FluidTowerReward());
-	}
+    /**
+     * loads the default rewards of the Chance Cube
+     */
+    public static void loadDefaultRewards() {
+        if (!CCubesSettings.enableHardCodedRewards)
+            return;
 
-	@Override
-	public void registerReward(IChanceCubeReward reward)
-	{
-		if(ConfigLoader.config.getBoolean(reward.getName(), ConfigLoader.giantRewardCat, true, "") && !this.nameToReward.containsKey(reward.getName()))
-		{
-			nameToReward.put(reward.getName(), reward);
-			redoSort(reward);
-		}
-	}
+        INSTANCE.registerReward(new BasicReward(CCubesCore.MODID + ":Village", 0, new SchematicRewardType(SchematicUtil.loadCustomSchematic(FileUtil.JSON_PARSER.parse(RewardData.VILLAGE_SCHEMATIC), 0, -1, 0, 0.05f, false, false, false))));
 
-	@Override
-	public boolean unregisterReward(String name)
-	{
-		Object o = nameToReward.remove(name);
-		if(o != null)
-			return sortedRewards.remove(o);
-		return false;
-	}
+        INSTANCE.registerReward(new BioDomeReward());
+        INSTANCE.registerReward(new TNTSlingReward());
+        INSTANCE.registerReward(new ThrowablesReward());
+        INSTANCE.registerReward(new OrePillarReward());
+        INSTANCE.registerReward(new ChunkReverserReward());
+        INSTANCE.registerReward(new FloorIsLavaReward());
+        INSTANCE.registerReward(new ChunkFlipReward());
+        INSTANCE.registerReward(new OreSphereReward());
+        INSTANCE.registerReward(new PotionsReward());
+        INSTANCE.registerReward(new FluidTowerReward());
+    }
 
-	@Override
-	public IChanceCubeReward getRewardByName(String name)
-	{
-		return nameToReward.get(name);
-	}
+    public void ClearRewards() {
+        this.sortedRewards.clear();
+        this.nameToReward.clear();
+    }
 
-	@Override
-	public void triggerRandomReward(World world, BlockPos pos, EntityPlayer player, int chance)
-	{
-		if(pos == null)
-			return;
-		if(this.sortedRewards.size() == 0)
-		{
-			CCubesCore.logger.log(Level.WARN, "There are no registered rewards with the Giant Chance Cubes and no reward was able to be given");
-			return;
-		}
+    @Override
+    public IChanceCubeReward getRewardByName(String name) {
+        return nameToReward.get(name);
+    }
 
-		int pick = world.rand.nextInt(sortedRewards.size());
-		CCubesCore.logger.log(Level.INFO, "Triggered the reward with the name of: " + sortedRewards.get(pick).getName());
-		sortedRewards.get(pick).trigger(world, pos, player);
-	}
+    private void redoSort(@Nullable IChanceCubeReward newReward) {
+        if (newReward != null)
+            sortedRewards.add(newReward);
 
-	private void redoSort(@Nullable IChanceCubeReward newReward)
-	{
-		if(newReward != null)
-			sortedRewards.add(newReward);
+        Collections.sort(sortedRewards, new Comparator<IChanceCubeReward>() {
+            public int compare(IChanceCubeReward o1, IChanceCubeReward o2) {
+                return o1.getChanceValue() - o2.getChanceValue();
+            }
 
-		Collections.sort(sortedRewards, new Comparator<IChanceCubeReward>()
-		{
-			public int compare(IChanceCubeReward o1, IChanceCubeReward o2)
-			{
-				return o1.getChanceValue() - o2.getChanceValue();
-			};
-		});
-	}
+            ;
+        });
+    }
 
-	public void ClearRewards()
-	{
-		this.sortedRewards.clear();
-		this.nameToReward.clear();
-	}
+    @Override
+    public void registerReward(IChanceCubeReward reward) {
+        if (ConfigLoader.config.getBoolean(reward.getName(), ConfigLoader.giantRewardCat, true, "") && !this.nameToReward.containsKey(reward.getName())) {
+            nameToReward.put(reward.getName(), reward);
+            redoSort(reward);
+        }
+    }
+
+    @Override
+    public void triggerRandomReward(World world, BlockPos pos, EntityPlayer player, int chance) {
+        if (pos == null)
+            return;
+        if (this.sortedRewards.size() == 0) {
+            CCubesCore.logger.log(Level.WARN, "There are no registered rewards with the Giant Chance Cubes and no reward was able to be given");
+            return;
+        }
+
+        int pick = world.rand.nextInt(sortedRewards.size());
+        CCubesCore.logger.log(Level.INFO, "Triggered the reward with the name of: " + sortedRewards.get(pick).getName());
+        sortedRewards.get(pick).trigger(world, pos, player);
+    }
+
+    @Override
+    public boolean unregisterReward(String name) {
+        Object o = nameToReward.remove(name);
+        if (o != null)
+            return sortedRewards.remove(o);
+        return false;
+    }
 }

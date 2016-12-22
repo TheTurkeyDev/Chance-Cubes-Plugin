@@ -1,73 +1,48 @@
 package chanceCubes.rewards.biodomeGen;
 
-import java.util.List;
-import java.util.Random;
-
+import chanceCubes.CCubesCore;
 import chanceCubes.rewards.giantRewards.BioDomeReward;
 import chanceCubes.rewards.rewardparts.OffsetBlock;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
-import net.minecraft.block.Block;
-import net.minecraft.entity.monster.EntityPolarBear;
-import net.minecraft.entity.monster.EntitySnowman;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import java.util.List;
+import java.util.Random;
+import net.minecraft.server.v1_10_R1.Block;
+import net.minecraft.server.v1_10_R1.Blocks;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 
-public class SnowGlobeBiome implements IBioDomeBiome
-{
-	private Random rand = new Random();
+public class SnowGlobeBiome implements IBioDomeBiome {
 
-	@Override
-	public void spawnEntities(final BlockPos pos, final World world)
-	{
-		for(int i = 0; i < rand.nextInt(10) + 5; i++)
-		{
-			EntitySnowman snowman = new EntitySnowman(world);
-			snowman.setLocationAndAngles(pos.getX() + (rand.nextInt(31) - 15), pos.getY() + 1, pos.getZ() + (rand.nextInt(31) - 15), 0, 0);
-			world.spawnEntityInWorld(snowman);
-		}
+    private Random rand = new Random();
 
-		Scheduler.scheduleTask(new Task("SnowGlobe Snow", 20)
-		{
-			@Override
-			public void callback()
-			{
-				for(int i = 0; i < 100; i++)
-				{
-					int ri = rand.nextInt(2);
-					if(ri == 0)
-					{
-						EntitySnowman snowman = new EntitySnowman(world);
-						snowman.setLocationAndAngles(pos.getX() + (rand.nextInt(31) - 15), pos.getY() + 1, pos.getZ() + (rand.nextInt(31) - 15), 0, 0);
-						world.spawnEntityInWorld(snowman);
-					}
-					else if(ri == 0)
-					{
-						EntityPolarBear polarBear = new EntityPolarBear(world);
-						polarBear.setLocationAndAngles(pos.getX() + (rand.nextInt(31) - 15), pos.getY() + 1, pos.getZ() + (rand.nextInt(31) - 15), 0, 0);
-						world.spawnEntityInWorld(polarBear);
-					}
-				}
-			}
-		});
-	}
+    @Override
+    public Block getFloorBlock() {
+        return Blocks.SNOW;
+    }
 
-	@Override
-	public Block getFloorBlock()
-	{
-		return Blocks.SNOW;
-	}
+    @Override
+    public void getRandomGenBlock(float dist, Random rand, int x, int y, int z, List<OffsetBlock> blocks, int delay) {
+        if (y != 0)
+            return;
+        if (dist < 0 && rand.nextInt(5) == 0) {
+            OffsetBlock osb = new OffsetBlock(x, y + 1, z, Blocks.SNOW_LAYER, false, (delay / BioDomeReward.delayShorten));
+            blocks.add(osb);
+        }
+    }
 
-	@Override
-	public void getRandomGenBlock(float dist, Random rand, int x, int y, int z, List<OffsetBlock> blocks, int delay)
-	{
-		if(y != 0)
-			return;
-		if(dist < 0 && rand.nextInt(5) == 0)
-		{
-			OffsetBlock osb = new OffsetBlock(x, y + 1, z, Blocks.SNOW_LAYER, false, (delay / BioDomeReward.delayShorten));
-			blocks.add(osb);
-		}
-	}
+    @Override
+    public void spawnEntities(final Location location) {
+        for (int i = 0; i < rand.nextInt(10) + 5; i++)
+            location.getWorld().spawnEntity(location.clone().add(rand.nextInt(31) - 15, 1, rand.nextInt(31) - 15), EntityType.SNOWMAN);
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(CCubesCore.instance(), () -> {
+            for (int i = 0; i < 100; i++) {
+                int ri = rand.nextInt(2);
+                if (ri == 0)
+                    location.getWorld().spawnEntity(location.clone().add(rand.nextInt(31) - 15, 1, rand.nextInt(31) - 15), EntityType.SNOWMAN);
+                else
+                    location.getWorld().spawnEntity(location.clone().add(rand.nextInt(31) - 15, 1, rand.nextInt(31) - 15), EntityType.POLAR_BEAR);
+            }
+        }, 20);
+    }
 }

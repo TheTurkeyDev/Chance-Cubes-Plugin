@@ -1,21 +1,19 @@
 package chanceCubes.hookins.mods;
 
-public abstract class BaseModHook
-{
-	public String modId;
+public abstract class BaseModHook {
 
-	private boolean enabled = false;
+    public String modId;
 
-	public BaseModHook(String modId)
-	{
-		this.modId = modId;
-		this.enabled = true;
-	}
+    private boolean enabled = false;
 
-	public abstract void loadRewards();
+    public BaseModHook(String modId) {
+        this.modId = modId;
+        this.enabled = true;
+    }
 
-	public boolean isEnabled()
-	{
-		return this.enabled;
-	}
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    public abstract void loadRewards();
 }

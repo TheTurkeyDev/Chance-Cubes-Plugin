@@ -1,38 +1,137 @@
 {
-	"War":
-	{
-		"chance": 0,
-		"Entity":
-		[
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}},
-			{"entity":{"id":"Zombie"}}
-		],
-		"Message":
-		[
-			{"message":"Are you ready for a war! - Turkey"}
-		]
-	}
+  "War": {
+    "chance": 0,
+    "Entity": [
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      },
+      {
+        "entity": {
+          "id": "Zombie"
+        }
+      }
+    ],
+    "Message": [
+      {
+        "message": "Are you ready for a war! - Turkey"
+      }
+    ]
+  }
 }

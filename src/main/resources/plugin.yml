@@ -1,0 +1,11 @@
+name: ChanceCubes
+version: @version@
+main: chanceCubes.CCubesCore
+authors: [Turkey2349, Musician101]
+description: Minecraft PvP plugin heavily based on World of Tanks.
+website: https://github.com/Musician101/ChanceCubes
+
+commands:
+    chancecubes:
+        aliases: [cc]
+        description: Base command for the plugin.

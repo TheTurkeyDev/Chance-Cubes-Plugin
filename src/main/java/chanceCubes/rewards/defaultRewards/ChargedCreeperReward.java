@@ -13,41 +13,35 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ChargedCreeperReward implements IChanceCubeReward
-{
+public class ChargedCreeperReward implements IChanceCubeReward {
 
-	@Override
-	public void trigger(final World world, final BlockPos pos, EntityPlayer player)
-	{
-		RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(0, 1, 0));
-		EntityCreeper ent = new EntityCreeper(world);
-		ent.setLocationAndAngles(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0);
-		ent.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 1, 99, true, false));
-		ent.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, 10, 99, true, false));
-		world.spawnEntityInWorld(ent);
+    @Override
+    public int getChanceValue() {
+        return -40;
+    }
 
-		Task task = new Task("Charged Creeper Reward", 2)
-		{
-			@Override
-			public void callback()
-			{
-				world.addWeatherEffect(new EntityLightningBolt(world, pos.getX(), pos.getY(), pos.getZ(), false));
-			}
-		};
+    @Override
+    public String getName() {
+        return CCubesCore.instance().getName().toLowerCase() + ":Charged_Creeper";
+    }
 
-		Scheduler.scheduleTask(task);
-	}
+    @Override
+    public void trigger(final Location location, final Player player) {
+        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(0, 1, 0));
+        EntityCreeper ent = new EntityCreeper(world);
+        ent.setLocationAndAngles(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0);
+        ent.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 1, 99, true, false));
+        ent.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, 10, 99, true, false));
+        world.spawnEntityInWorld(ent);
 
-	@Override
-	public int getChanceValue()
-	{
-		return -40;
-	}
+        Task task = new Task("Charged Creeper Reward", 2) {
+            @Override
+            public void callback() {
+                world.addWeatherEffect(new EntityLightningBolt(world, pos.getX(), pos.getY(), pos.getZ(), false));
+            }
+        };
 
-	@Override
-	public String getName()
-	{
-		return CCubesCore.MODID + ":Charged_Creeper";
-	}
+        Scheduler.scheduleTask(task);
+    }
 
 }

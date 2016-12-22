@@ -1,178 +1,155 @@
 package chanceCubes.client.gui;
 
+import com.google.common.collect.Lists;
 import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiListExtended;
 import net.minecraft.client.gui.GuiTextField;
 
-import com.google.common.collect.Lists;
+public class CustomExtendedList extends GuiListExtended {
 
-public class CustomExtendedList extends GuiListExtended
-{
-	public List<IGuiListEntry> elements = Lists.newArrayList();
+    public List<IGuiListEntry> elements = Lists.newArrayList();
 
-	private Minecraft mc;
-	private ConfigGui parentScreen;
+    private Minecraft mc;
+    private ConfigGui parentScreen;
 
-	public CustomExtendedList(ConfigGui parentScreen, Minecraft mc, int p_i45010_2_, int p_i45010_3_, int p_i45010_4_, int p_i45010_5_, int p_i45010_6_)
-	{
-		super(mc, p_i45010_2_, p_i45010_3_, p_i45010_4_, p_i45010_5_, p_i45010_6_);
-		this.parentScreen = parentScreen;
-		this.mc = mc;
-	}
+    public CustomExtendedList(ConfigGui parentScreen, Minecraft mc, int p_i45010_2_, int p_i45010_3_, int p_i45010_4_, int p_i45010_5_, int p_i45010_6_) {
+        super(mc, p_i45010_2_, p_i45010_3_, p_i45010_4_, p_i45010_5_, p_i45010_6_);
+        this.parentScreen = parentScreen;
+        this.mc = mc;
+    }
 
-	@Override
-	public IGuiListEntry getListEntry(int index)
-	{
-		return elements.get(index);
-	}
+    public void addButton(String e) {
+        elements.add(new CustomListEntry(e, parentScreen, mc, elements.size()));
+    }
 
-	@Override
-	protected int getSize()
-	{
-		return elements.size();
-	}
+    public void addTextEntry(String label, String textBoxText) {
+        elements.add(new CustomTextEntry(parentScreen, mc, label, textBoxText));
+    }
 
-	public void addButton(String e)
-	{
-		elements.add(new CustomListEntry(e, parentScreen, mc, elements.size()));
-	}
+    public void clearElements() {
+        elements.clear();
+    }
 
-	public void addTextEntry(String label, String textBoxText)
-	{
-		elements.add(new CustomTextEntry(parentScreen, mc, label, textBoxText));
-	}
+    @Override
+    public IGuiListEntry getListEntry(int index) {
+        return elements.get(index);
+    }
 
-	public void clearElements()
-	{
-		elements.clear();
-	}
+    @Override
+    protected int getSize() {
+        return elements.size();
+    }
 
-	protected void keyTyped(char p_73869_1_, int p_73869_2_)
-	{
-		for(IGuiListEntry entry : elements)
-			if(entry instanceof CustomTextEntry)
-				((CustomTextEntry) entry).keyTyped(p_73869_1_, p_73869_2_);
-	}
+    protected void keyTyped(char p_73869_1_, int p_73869_2_) {
+        for (IGuiListEntry entry : elements)
+            if (entry instanceof CustomTextEntry)
+                ((CustomTextEntry) entry).keyTyped(p_73869_1_, p_73869_2_);
+    }
 
-	@Override
-	public boolean mouseClicked(int x, int y, int mouseEvent)
-	{
-		super.mouseClicked(x, y, mouseEvent);
-		for(IGuiListEntry entry : elements)
-			if(entry instanceof CustomTextEntry)
-				((CustomTextEntry) entry).mousePressed(0, x, y, mouseEvent, 0, 0);
-		return true;
-	}
+    @Override
+    public boolean mouseClicked(int x, int y, int mouseEvent) {
+        super.mouseClicked(x, y, mouseEvent);
+        for (IGuiListEntry entry : elements)
+            if (entry instanceof CustomTextEntry)
+                ((CustomTextEntry) entry).mousePressed(0, x, y, mouseEvent, 0, 0);
+        return true;
+    }
 
-	public class CustomListEntry implements IGuiListEntry
-	{
-		private String name;
-		private GuiButton button;
-		private ConfigGui parentScreen;
-		private Minecraft mc;
+    public class CustomListEntry implements IGuiListEntry {
 
-		public CustomListEntry(String name, ConfigGui parentScreen, Minecraft mc, int id)
-		{
-			this.name = name;
-			this.parentScreen = parentScreen;
-			button = new GuiButton(id, 0, 0, 200, 20, name);
-			this.mc = mc;
-		}
+        private GuiButton button;
+        private Minecraft mc;
+        private String name;
+        private ConfigGui parentScreen;
 
-		@Override
-		public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
-		{
-			this.button.displayString = name;
-			this.button.xPosition = x;
-			this.button.yPosition = y;
-			// this.button.enabled = enabled();
-			this.button.drawButton(mc, mouseX, mouseY);
-		}
+        public CustomListEntry(String name, ConfigGui parentScreen, Minecraft mc, int id) {
+            this.name = name;
+            this.parentScreen = parentScreen;
+            button = new GuiButton(id, 0, 0, 200, 20, name);
+            this.mc = mc;
+        }
 
-		@Override
-		public boolean mousePressed(int index, int x, int y, int mouseEvent, int relativeX, int relativeY)
-		{
-			if(this.button.mousePressed(mc, x, y))
-				parentScreen.nextEditStage(button.id, button.displayString);
-			return false;
-		}
+        @Override
+        public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected) {
+            this.button.displayString = name;
+            this.button.xPosition = x;
+            this.button.yPosition = y;
+            // this.button.enabled = enabled();
+            this.button.drawButton(mc, mouseX, mouseY);
+        }
 
-		@Override
-		public void mouseReleased(int index, int x, int y, int mouseEvent, int relativeX, int relativeY)
-		{
+        @Override
+        public boolean mousePressed(int index, int x, int y, int mouseEvent, int relativeX, int relativeY) {
+            if (this.button.mousePressed(mc, x, y))
+                parentScreen.nextEditStage(button.id, button.displayString);
+            return false;
+        }
 
-		}
+        @Override
+        public void mouseReleased(int index, int x, int y, int mouseEvent, int relativeX, int relativeY) {
 
-		@Override
-		public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_)
-		{
+        }
 
-		}
-	}
+        @Override
+        public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_) {
 
-	public class CustomTextEntry implements IGuiListEntry
-	{
-		private GuiTextField text;
-		@SuppressWarnings("unused")
-		private ConfigGui parentScreen;
-		private Minecraft mc;
-		private String label;
+        }
+    }
 
-		public CustomTextEntry(ConfigGui parentScreen, Minecraft mc, String label, String textBoxText)
-		{
-			this.parentScreen = parentScreen;
-			text = new GuiTextField(0, mc.fontRendererObj, 0, 0, 200, 20);
-			text.setMaxStringLength(1000);
-			text.setText(textBoxText);
-			this.mc = mc;
-			this.label = label + ":";
-		}
+    public class CustomTextEntry implements IGuiListEntry {
 
-		@Override
-		public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
-		{
-			this.text.xPosition = x + 30;
-			this.text.yPosition = y;
-			// this.button.enabled = enabled();
-			this.text.drawTextBox();
-			mc.fontRendererObj.drawString(this.label, x - (int) (label.length() * 3), y + 7, 0xFFFFFF);
-		}
+        private String label;
+        private Minecraft mc;
+        @SuppressWarnings("unused")
+        private ConfigGui parentScreen;
+        private GuiTextField text;
 
-		@Override
-		public boolean mousePressed(int index, int x, int y, int mouseEvent, int relativeX, int relativeY)
-		{
-			text.mouseClicked(x, y, mouseEvent);
-			return false;
-		}
+        public CustomTextEntry(ConfigGui parentScreen, Minecraft mc, String label, String textBoxText) {
+            this.parentScreen = parentScreen;
+            text = new GuiTextField(0, mc.fontRendererObj, 0, 0, 200, 20);
+            text.setMaxStringLength(1000);
+            text.setText(textBoxText);
+            this.mc = mc;
+            this.label = label + ":";
+        }
 
-		@Override
-		public void mouseReleased(int index, int x, int y, int mouseEvent, int relativeX, int relativeY)
-		{
+        @Override
+        public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected) {
+            this.text.xPosition = x + 30;
+            this.text.yPosition = y;
+            // this.button.enabled = enabled();
+            this.text.drawTextBox();
+            mc.fontRendererObj.drawString(this.label, x - (int) (label.length() * 3), y + 7, 0xFFFFFF);
+        }
 
-		}
+        public String getLabel() {
+            return this.label;
+        }
 
-		public void keyTyped(char p_73869_1_, int p_73869_2_)
-		{
-			this.text.textboxKeyTyped(p_73869_1_, p_73869_2_);
-		}
+        public GuiTextField getTextBox() {
+            return this.text;
+        }
 
-		public String getLabel()
-		{
-			return this.label;
-		}
+        public void keyTyped(char p_73869_1_, int p_73869_2_) {
+            this.text.textboxKeyTyped(p_73869_1_, p_73869_2_);
+        }
 
-		public GuiTextField getTextBox()
-		{
-			return this.text;
-		}
+        @Override
+        public boolean mousePressed(int index, int x, int y, int mouseEvent, int relativeX, int relativeY) {
+            text.mouseClicked(x, y, mouseEvent);
+            return false;
+        }
 
-		@Override
-		public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_)
-		{
+        @Override
+        public void mouseReleased(int index, int x, int y, int mouseEvent, int relativeX, int relativeY) {
 
-		}
-	}
+        }
+
+        @Override
+        public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_) {
+
+        }
+    }
 }

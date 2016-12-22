@@ -1,89 +1,77 @@
 package chanceCubes.rewards.defaultRewards;
 
-import java.util.Random;
-
 import chanceCubes.CCubesCore;
-import chanceCubes.blocks.CCubesBlocks;
-import chanceCubes.tileentities.TileChanceCube;
+import chanceCubes.items.CCubesItems;
 import chanceCubes.util.RewardsUtil;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import java.util.Random;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
+import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 
-public class OneIsLuckyReward implements IChanceCubeReward
-{
-	private Random random = new Random();
+public class OneIsLuckyReward implements IChanceCubeReward {
 
-	@Override
-	public void trigger(final World world, final BlockPos pos, EntityPlayer player)
-	{
-		RewardsUtil.sendMessageToNearPlayers(world, pos, 32, "A Lucky Block Salute");
-		TileEntitySign sign = new TileEntitySign();
-		sign.signText[0] = new TextComponentString("One is lucky");
-		sign.signText[1] = new TextComponentString("One is not");
-		sign.signText[3] = new TextComponentString("#OGLuckyBlocks");
-		boolean leftLucky = random.nextBoolean();
-		TileChanceCube leftCube = new TileChanceCube(leftLucky ? 100 : -100);
-		TileChanceCube rightCube = new TileChanceCube(!leftLucky ? 100 : -100);
+    private Random random = new Random();
 
-		if(RewardsUtil.placeBlock(CCubesBlocks.CHANCE_CUBE.getDefaultState(), world, pos.add(-1, 0, 0)))
-			world.setTileEntity(pos.add(-1, 0, 0), leftCube);
-		if(RewardsUtil.placeBlock(Blocks.STANDING_SIGN.getDefaultState(), world, pos))
-			world.setTileEntity(pos, sign);
-		if(RewardsUtil.placeBlock(CCubesBlocks.CHANCE_CUBE.getDefaultState(), world, pos.add(1, 0, 0)))
-			world.setTileEntity(pos.add(1, 0, 0), rightCube);
+    @Override
+    public int getChanceValue() {
+        return 0;
+    }
 
-		Task task = new Task("One_Is_Lucky_Reward", 10)
-		{
-			@Override
-			public void callback()
-			{
-				update(0, world, pos);
-			}
-		};
-		Scheduler.scheduleTask(task);
-	}
+    @Override
+    public String getName() {
+        return CCubesCore.instance().getName().toLowerCase() + ":One_Is_Lucky";
+    }
 
-	@Override
-	public int getChanceValue()
-	{
-		return 0;
-	}
+    @Override
+    public void trigger(final Location location, final Player player) {
+        RewardsUtil.sendMessageToNearPlayers(location, 32, "A Lucky Block Salute");
+        boolean leftLucky = random.nextBoolean();
+        if (RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), location.clone().add(-1, 0, 0))) {
+            BlockState chanceCube = location.clone().add(-1, 0, 0).getBlock().getState();
+            chanceCube.setMetadata("ChanceCubes-Chance", new FixedMetadataValue(CCubesCore.instance(), leftLucky ? 100 : -100));
+            chanceCube.update(true);
+        }
 
-	@Override
-	public String getName()
-	{
-		return CCubesCore.MODID + ":One_Is_Lucky";
-	}
+        if (RewardsUtil.placeBlock(Material.SIGN_POST, location)) {
+            Sign sign = (Sign) location.getBlock().getState();
+            sign.setLine(0, "One is lucky");
+            sign.setLine(1, "One is not");
+            sign.setLine(3, "#OGLuckyBlocks");
+            sign.update(true);
+        }
 
-	public void update(final int iteration, final World world, final BlockPos pos)
-	{
-		boolean flag = false;
+        if (RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), location.clone().add(-1, 0, 0))) {
+            BlockState chanceCube = location.clone().add(-1, 0, 0).getBlock().getState();
+            chanceCube.setMetadata("ChanceCubes-Chance", new FixedMetadataValue(CCubesCore.instance(), !leftLucky ? 100 : -100));
+            chanceCube.update(true);
+        }
 
-		if(world.isAirBlock(pos.add(-1, 0, 0)) || world.isAirBlock(pos.add(1, 0, 0)))
-			flag = true;
+        Bukkit.getScheduler().scheduleSyncDelayedTask(CCubesCore.instance(), () -> update(0, location), 10);
+    }
 
-		if(iteration == 600 || flag)
-		{
-			world.setBlockToAir(pos.add(-1, 0, 0));
-			world.setBlockToAir(pos);
-			world.setBlockToAir(pos.add(1, 0, 0));
-			return;
-		}
+    public void update(final int iteration, final Location location) {
+        BlockState left = location.clone().subtract(1, 0, 0).getBlock().getState();
+        BlockState center = location.clone().getBlock().getState();
+        BlockState right = location.clone().add(1, 0, 0).getBlock().getState();
+        boolean flag = false;
 
-		Task task = new Task("One_Is_Lucky_Reward", 10)
-		{
-			@Override
-			public void callback()
-			{
-				update(iteration + 1, world, pos);
-			}
-		};
-		Scheduler.scheduleTask(task);
-	}
+        if (left.getType() == Material.AIR || right.getType() == Material.AIR)
+            flag = true;
+
+        if (iteration == 600 || flag) {
+            left.setType(Material.AIR);
+            left.update(true);
+            center.setType(Material.AIR);
+            center.update(true);
+            left.setType(Material.AIR);
+            left.update(true);
+            return;
+        }
+
+        RewardsUtil.scheduleTask(() -> update(iteration + 1, location), 10);
+    }
 }

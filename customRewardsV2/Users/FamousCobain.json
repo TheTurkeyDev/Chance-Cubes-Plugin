@@ -1,14 +1,23 @@
 {
-	"diamond_nub":
-	{
-		"chance": 0,
-		"Message":
-		[
-			{"message":"Have a klenex! -Turkey"}
-		],
-		"Item":
-		[
-			{"item":{"id":"minecraft:paper","Count":1,"tag":{"display":{"Name":"klenex"}}}}
-		]
-	}
+  "diamond_nub": {
+    "chance": 0,
+    "Message": [
+      {
+        "message": "Have a klenex! -Turkey"
+      }
+    ],
+    "Item": [
+      {
+        "item": {
+          "id": "minecraft:paper",
+          "Count": 1,
+          "tag": {
+            "display": {
+              "Name": "klenex"
+            }
+          }
+        }
+      }
+    ]
+  }
 }

@@ -1,66 +1,56 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
-import chanceCubes.util.CCubesAchievements;
 import chanceCubes.util.RewardsUtil;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.boss.EntityWither;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import java.util.Random;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Wither;
 
-public class WitherReward implements IChanceCubeReward
-{
-	@Override
-	public void trigger(World world, BlockPos pos, final EntityPlayer player)
-	{
-		final EntityWither wither = new EntityWither(world);
-		wither.setLocationAndAngles(pos.getX() + 0.5D, pos.getY() + 1D, pos.getZ() + 1.5D, 90.0F, 0.0F);
-		wither.renderYawOffset = 90.0F;
-		wither.ignite();
-		if(world.rand.nextBoolean())
-			wither.setCustomNameTag("Kiwi");
-		else
-			wither.setCustomNameTag("Kehaan");
-		world.spawnEntityInWorld(wither);
+public class WitherReward implements IChanceCubeReward {
 
-		RewardsUtil.sendMessageToNearPlayers(world, pos, 32, "\"You've got to ask yourself one question: 'Do I feel lucky?' Well, do ya, punk?\"");
+    @Override
+    public int getChanceValue() {
+        return -100;
+    }
 
-		Task task = new Task("Wither Reward", 180)
-		{
-			@Override
-			public void callback()
-			{
-				if(!removeEnts(wither))
-					player.addStat(CCubesAchievements.wither);
-			}
-		};
+    @Override
+    public String getName() {
+        return CCubesCore.instance().getName().toLowerCase() + ":Wither";
+    }
 
-		Scheduler.scheduleTask(task);
-	}
+    private boolean removeEnts(Entity ent) {
+        if (new Random().nextInt(10) != 1) {
+            ent.remove();
+            return true;
+        }
 
-	private boolean removeEnts(Entity ent)
-	{
-		if(ent.worldObj.rand.nextInt(10) != 1)
-		{
-			ent.setDead();
-			return true;
-		}
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public int getChanceValue()
-	{
-		return -100;
-	}
+    @Override
+    public void trigger(Location location, Player player) {
+        Location witherLoc = location.clone().add(0.5, 1, 1.5);
+        witherLoc.setPitch(90F);
+        Wither wither = (Wither) location.getWorld().spawnEntity(witherLoc, EntityType.WITHER);
+        if (new Random().nextBoolean())
+            wither.setCustomName("Kiwi");
+        else
+            wither.setCustomName("Kehaan");
 
-	@Override
-	public String getName()
-	{
-		return CCubesCore.MODID + ":Wither";
-	}
+        wither.setCustomNameVisible(true);
+
+        RewardsUtil.sendMessageToNearPlayers(location, 32, "\"You've got to ask yourself one question: 'Do I feel lucky?' Well, do ya, punk?\"");
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(CCubesCore.instance(), () -> {
+            removeEnts(wither);
+            //TODO need to work on custom Achievements
+            /*if (!removeEnts(wither))
+                player.awardAchievement(CCubesAchievements.wither);*/
+        }, 180);
+    }
 
 }

@@ -1,47 +1,35 @@
 package chanceCubes.registry;
 
-import javax.annotation.Nullable;
-
 import chanceCubes.rewards.defaultRewards.IChanceCubeReward;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import javax.annotation.Nullable;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
-public interface IRewardRegistry
-{
-    /**
-     * Registers the given reward as a possible outcome
-     * 
-     * @param reward
-     *            to register
-     */
-    void registerReward(IChanceCubeReward reward);
-
-    /**
-     * Unregisters a reward with the given name
-     * 
-     * @param name
-     *            of the reward to remove
-     * @return true is a reward was successfully removed, false if a reward was not removed
-     */
-    boolean unregisterReward(String name);
+public interface IRewardRegistry {
 
     @Nullable
     IChanceCubeReward getRewardByName(String name);
 
     /**
-     * Triggers a random reward in the given world at the given location
-     * 
-     * @param world
-     *            The world object
-     * @param pos
-     *            The position of the block
-     * @param player
-     *            The player receiving the reward
-     * @param luck
-     *            The chance of the block
-     * @param luckBounds
-     *            Min and max chance values
+     * Registers the given reward as a possible outcome
+     *
+     * @param reward to register
      */
-    void triggerRandomReward(World world, BlockPos pos, EntityPlayer player, int chance);
+    void registerReward(IChanceCubeReward reward);
+
+    /**
+     * Triggers a random reward in the given world at the given location
+     *
+     * @param location      The location of the reward
+     * @param player     The player receiving the reward
+     */
+    void triggerRandomReward(Location location, Player player, int chance);
+
+    /**
+     * Unregisters a reward with the given name
+     *
+     * @param name of the reward to remove
+     * @return true is a reward was successfully removed, false if a reward was not removed
+     */
+    boolean unregisterReward(String name);
 }

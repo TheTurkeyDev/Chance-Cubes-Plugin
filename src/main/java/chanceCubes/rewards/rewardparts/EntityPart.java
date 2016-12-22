@@ -1,59 +1,48 @@
 package chanceCubes.rewards.rewardparts;
 
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTException;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.v1_10_R1.MojangsonParseException;
+import net.minecraft.server.v1_10_R1.MojangsonParser;
+import net.minecraft.server.v1_10_R1.NBTTagCompound;
 
-public class EntityPart
-{
-	public static String[] elements = new String[] { "entity:S", "delay:I" };
+public class EntityPart {
 
-	private NBTTagCompound nbtData;
+    public static String[] elements = new String[]{"entity:S", "delay:I"};
+    private int delay = 0;
+    private NBTTagCompound nbtData;
+    private boolean removedBlocks = true;
 
-	private int delay = 0;
+    public EntityPart(NBTTagCompound nbtData) {
+        this.nbtData = nbtData;
+    }
 
-	private boolean removedBlocks = true;
+    public EntityPart(String nbtRaw) {
+        try {
+            this.nbtData = MojangsonParser.parse(nbtRaw);
+        }
+        catch (MojangsonParseException e) {
+            e.printStackTrace();
+        }
+    }
 
-	public EntityPart(NBTTagCompound nbtData)
-	{
-		this.nbtData = nbtData;
-	}
+    public int getDelay() {
+        return delay;
+    }
 
-	public EntityPart(String nbtRaw)
-	{
-		try
-		{
-			this.nbtData = (NBTTagCompound) JsonToNBT.getTagFromJson(nbtRaw);
-		} catch(NBTException e)
-		{
-			e.printStackTrace();
-		}
-	}
+    public EntityPart setDelay(int delay) {
+        this.delay = delay;
+        return this;
+    }
 
-	public NBTTagCompound getNBT()
-	{
-		return nbtData;
-	}
+    public NBTTagCompound getNBT() {
+        return nbtData;
+    }
 
-	public int getDelay()
-	{
-		return delay;
-	}
+    public EntityPart setRemovedBlocks(boolean removedBlocks) {
+        this.removedBlocks = removedBlocks;
+        return this;
+    }
 
-	public EntityPart setDelay(int delay)
-	{
-		this.delay = delay;
-		return this;
-	}
-
-	public boolean shouldRemovedBlocks()
-	{
-		return removedBlocks;
-	}
-
-	public EntityPart setRemovedBlocks(boolean removedBlocks)
-	{
-		this.removedBlocks = removedBlocks;
-		return this;
-	}
+    public boolean shouldRemovedBlocks() {
+        return removedBlocks;
+    }
 }

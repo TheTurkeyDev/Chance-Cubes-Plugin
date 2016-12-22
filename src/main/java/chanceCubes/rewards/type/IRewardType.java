@@ -1,17 +1,15 @@
 package chanceCubes.rewards.type;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
-public interface IRewardType
-{
+public interface IRewardType {
 
-	/**
-	 * What occurs when the this Reward type is triggered
-	 * @param world
-	 * @param x
-	 * @param y
-	 * @param z
-	 */
-	public void trigger(World world, int x, int y, int z, EntityPlayer player);
+    /**
+     * What occurs when the this Reward type is triggered
+     *
+     * @param location
+     * @param player
+     */
+    void trigger(Location location, Player player);
 }

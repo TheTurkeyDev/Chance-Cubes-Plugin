@@ -1,94 +1,75 @@
 package chanceCubes.rewards.rewardparts;
 
-import net.minecraft.util.SoundEvent;
+import org.bukkit.Sound;
 
-public class SoundPart
-{
-	public static String[] elements = new String[] { "sound:S", "delay:I", "serverWide:B", "range:I" };
+public class SoundPart {
 
-	private SoundEvent sound;
+    public static String[] elements = new String[]{"sound:S", "delay:I", "serverWide:B", "range:I"};
+    private boolean atPlayersLocation = false;
+    private int delay = 0;
+    private int pitch = 1;
+    private int range = 16;
+    private boolean serverWide = false;
+    private Sound sound;
+    private int volume = 1;
 
-	private int delay = 0;
+    public SoundPart(Sound sound) {
+        this.sound = sound;
+    }
 
-	private boolean serverWide = false;
-	private int range = 16;
+    public int getDelay() {
+        return delay;
+    }
 
-	private int volume = 1;
-	private int pitch = 1;
+    public SoundPart setDelay(int delay) {
+        this.delay = delay;
+        return this;
+    }
 
-	private boolean atPlayersLocation = false;
+    public int getPitch() {
+        return pitch;
+    }
 
-	public SoundPart(SoundEvent sound)
-	{
-		this.sound = sound;
-	}
+    public void setPitch(int pitch) {
+        this.pitch = pitch;
+    }
 
-	public SoundEvent getSound()
-	{
-		return sound;
-	}
+    public int getRange() {
+        return range;
+    }
 
-	public int getDelay()
-	{
-		return delay;
-	}
+    public SoundPart setRange(int range) {
+        this.range = range;
+        return this;
+    }
 
-	public SoundPart setDelay(int delay)
-	{
-		this.delay = delay;
-		return this;
-	}
+    public Sound getSound() {
+        return sound;
+    }
 
-	public boolean isServerWide()
-	{
-		return serverWide;
-	}
+    public int getVolume() {
+        return volume;
+    }
 
-	public SoundPart setServerWide(boolean serverWide)
-	{
-		this.serverWide = serverWide;
-		return this;
-	}
+    public void setVolume(int volume) {
+        this.volume = volume;
+    }
 
-	public int getRange()
-	{
-		return range;
-	}
+    public boolean isServerWide() {
+        return serverWide;
+    }
 
-	public SoundPart setRange(int range)
-	{
-		this.range = range;
-		return this;
-	}
+    public SoundPart setServerWide(boolean serverWide) {
+        this.serverWide = serverWide;
+        return this;
+    }
 
-	public int getVolume()
-	{
-		return volume;
-	}
+    public boolean playAtPlayersLocation() {
+        return atPlayersLocation;
+    }
 
-	public void setVolume(int volume)
-	{
-		this.volume = volume;
-	}
-
-	public int getPitch()
-	{
-		return pitch;
-	}
-
-	public void setPitch(int pitch)
-	{
-		this.pitch = pitch;
-	}
-
-	public boolean playAtPlayersLocation()
-	{
-		return atPlayersLocation;
-	}
-
-	public SoundPart setAtPlayersLocation(boolean atPlayersLocation)
-	{
-		this.atPlayersLocation = atPlayersLocation;
-		return this;
-	}
+    public SoundPart setAtPlayersLocation(boolean atPlayersLocation) {
+        this.atPlayersLocation = atPlayersLocation;
+        return this;
+    }
 }

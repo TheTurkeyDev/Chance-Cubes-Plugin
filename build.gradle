@@ -1,23 +1,9 @@
-
-// For those who want the bleeding edge
-buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
-    }
-}
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'idea'
+apply plugin: 'java'
 apply plugin: 'maven'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 ext.buildnumber = 0
 if (System.getenv('BUILD_NUMBER') != null)
@@ -25,34 +11,31 @@ if (System.getenv('BUILD_NUMBER') != null)
 else
     logger.lifecycle "No build number detected, setting to 0"
 
-	
-group= "chanceCubes.CCubesCore"
-archivesBaseName = "ChanceCubes"
-version = "${mc_version}-${mod_version}.${buildnumber}"
+group "chanceCubes.CCubesCore"
+version project.mod_version
 
-minecraft {
-    version = "${mc_version}-${forge_version}"
-    runDir = "run-1.10"
-	
-    mappings = "snapshot_20160518"
-	
-	replace "@VERSION@", project.version
-    replaceIn "CCubesCore.java"
-    replaceIn "mcmod.info"
+repositories {
+    mavenCentral()
+    // Needed for NMS dependencies, courtesy of Spigot's BuildTools
+    mavenLocal()
+    maven {
+        name = 'spigotmc'
+        url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https:/oss.sonatype.org/content/groups/public/'
+    }
 }
 
-processResources
-{
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+dependencies {
+    compile 'org.spigotmc:spigot:1.10.2-R0.1-SNAPSHOT'
+    compile 'com.google.code.gson:gson:2.6.2'
+}
 
+processResources {
     from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+        expand 'version': project.version
     }
 }
 

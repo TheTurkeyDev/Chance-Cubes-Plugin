@@ -1,56 +1,45 @@
 package chanceCubes.rewards.rewardparts;
 
-public class MessagePart
-{
-	public static String[] elements = new String[]{"message:S", "delay:I", "serverWide:B", "range:I"};
-	
-	private String message;
-	
-	private int delay = 0;
-	
-	private boolean serverWide = false;
-	private int range = 32;
-	
-	public MessagePart(String message)
-	{
-		this.message = message;
-	}
+public class MessagePart {
 
-	public String getMessage()
-	{
-		return message;
-	}
+    public static String[] elements = new String[]{"message:S", "delay:I", "serverWide:B", "range:I"};
+    private int delay = 0;
+    private String message;
+    private int range = 32;
+    private boolean serverWide = false;
 
-	public int getDelay()
-	{
-		return delay;
-	}
+    public MessagePart(String message) {
+        this.message = message;
+    }
 
-	public MessagePart setDelay(int delay)
-	{
-		this.delay = delay;
-		return this;
-	}
+    public int getDelay() {
+        return delay;
+    }
 
-	public boolean isServerWide()
-	{
-		return serverWide;
-	}
+    public MessagePart setDelay(int delay) {
+        this.delay = delay;
+        return this;
+    }
 
-	public MessagePart setServerWide(boolean serverWide)
-	{
-		this.serverWide = serverWide;
-		return this;
-	}
+    public String getMessage() {
+        return message;
+    }
 
-	public int getRange()
-	{
-		return range;
-	}
+    public int getRange() {
+        return range;
+    }
 
-	public MessagePart setRange(int range)
-	{
-		this.range = range;
-		return this;
-	}
+    public MessagePart setRange(int range) {
+        this.range = range;
+        return this;
+    }
+
+    public boolean isServerWide() {
+        return serverWide;
+    }
+
+    public MessagePart setServerWide(boolean serverWide) {
+        this.serverWide = serverWide;
+        return this;
+    }
 }

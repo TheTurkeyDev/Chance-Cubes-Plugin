@@ -2,67 +2,42 @@ package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
 import chanceCubes.util.RewardsUtil;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityTNTPrimed;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import java.util.Random;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 
-public class TrollTNTReward implements IChanceCubeReward
-{
+public class TrollTNTReward implements IChanceCubeReward {
 
-	@Override
-	public void trigger(World world, BlockPos pos, final EntityPlayer player)
-	{
-		for(int x = -1; x < 2; x++)
-		{
-			for(int z = -1; z < 2; z++)
-			{
-				RewardsUtil.placeBlock(Blocks.WEB.getDefaultState(), world, new BlockPos(player.posX + x, player.posY, player.posZ + z));
-			}
-		}
+    @Override
+    public int getChanceValue() {
+        return -5;
+    }
 
-		final EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(world, player.posX + 1D, player.posY + 1D, player.posZ, player);
-		world.spawnEntityInWorld(entitytntprimed);
-		world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0F, 1.0F);
+    @Override
+    public String getName() {
+        return CCubesCore.instance().getName().toLowerCase() + ":TrollTNT";
+    }
 
-		if(world.rand.nextInt(5) != 1)
-		{
-			Task task = new Task("TrollTNT", 80)
-			{
-				@Override
-				public void callback()
-				{
-					timeUp(entitytntprimed, player);
-				}
+    private void timeUp(Entity ent, Player player) {
+        player.sendMessage("BOOM");
+        ent.remove();
+    }
 
-			};
+    @Override
+    public void trigger(Location location, final Player player) {
+        for (int x = -1; x < 2; x++)
+            for (int z = -1; z < 2; z++)
+                RewardsUtil.placeBlock(Material.WEB, location.clone().add(x, 0, z));
 
-			Scheduler.scheduleTask(task);
-		}
-	}
-
-	private void timeUp(Entity ent, EntityPlayer player)
-	{
-		player.addChatMessage(new TextComponentString("BOOM"));
-		ent.setDead();
-	}
-
-	@Override
-	public int getChanceValue()
-	{
-		return -5;
-	}
-
-	@Override
-	public String getName()
-	{
-		return CCubesCore.MODID + ":TrollTNT";
-	}
+        TNTPrimed tnt = (TNTPrimed) location.getWorld().spawnEntity(location.clone().add(1, 1, 0), EntityType.PRIMED_TNT);
+        player.playSound(player.getLocation(), Sound.ENTITY_TNT_PRIMED, 1F, 1F);
+        if (new Random().nextInt(5) != 1)
+            Bukkit.getScheduler().scheduleSyncDelayedTask(CCubesCore.instance(), () -> timeUp(tnt, player), 80);
+    }
 }

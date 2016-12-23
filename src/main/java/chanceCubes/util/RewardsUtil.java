@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import net.minecraft.server.v1_10_R1.Block;
 import net.minecraft.server.v1_10_R1.Item;
 import net.minecraft.server.v1_10_R1.MinecraftKey;
 import net.minecraft.server.v1_10_R1.NBTTagCompound;
@@ -18,9 +17,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 
 public class RewardsUtil {
@@ -76,12 +77,12 @@ public class RewardsUtil {
      * @param relativeToPlayer
      * @return
      */
-    public static OffsetBlock[] fillArea(int xSize, int ySize, int zSize, net.minecraft.server.v1_10_R1.Block block, int xOff, int yOff, int zOff, boolean falling, int delay, boolean causesUpdate, boolean relativeToPlayer) {
+    public static OffsetBlock[] fillArea(int xSize, int ySize, int zSize, Block block, int xOff, int yOff, int zOff, boolean falling, int delay, boolean causesUpdate, boolean relativeToPlayer) {
         List<OffsetBlock> toReturn = new ArrayList<>();
         for (int y = 0; y < ySize; y++)
             for (int z = 0; z < zSize; z++)
                 for (int x = 0; x < xSize; x++)
-                    toReturn.add(new OffsetBlock(x + xOff, y + yOff, z + zOff, block, falling, delay).setCausesBlockUpdate(causesUpdate).setRelativeToPlayer(relativeToPlayer));
+                    toReturn.add(new OffsetBlock(x + xOff, y + yOff, z + zOff, block.getType(), falling, block.getState().getData(), delay).setCausesBlockUpdate(causesUpdate).setRelativeToPlayer(relativeToPlayer));
 
         return toReturn.toArray(new OffsetBlock[toReturn.size()]);
     }
@@ -132,10 +133,10 @@ public class RewardsUtil {
         return material;
     }
 
-    public static SimpleEntry<Block, Integer> getRandomOre() {
+    public static SimpleEntry<net.minecraft.server.v1_10_R1.Block, Integer> getRandomOre() {
         List<Material> ores = Arrays.asList(Material.COAL_ORE, Material.DIAMOND_ORE, Material.EMERALD_ORE, Material.GOLD_ORE, Material.IRON_ORE, Material.LAPIS_ORE, Material.QUARTZ_ORE, Material.REDSTONE_ORE);
         ItemStack itemStack = new ItemStack(ores.get(rand.nextInt(ores.size())));
-        Block ore = Block.asBlock(CraftItemStack.asNMSCopy(itemStack).getItem());
+        net.minecraft.server.v1_10_R1.Block ore = net.minecraft.server.v1_10_R1.Block.asBlock(CraftItemStack.asNMSCopy(itemStack).getItem());
         int meta = itemStack.getDurability();
         return new SimpleEntry<>(ore, meta);
     }
@@ -183,12 +184,13 @@ public class RewardsUtil {
         return isUnbreakable;
     }
 
-    public static boolean placeBlock(Material material, Location location) {
+    public static boolean placeBlock(Material material, MaterialData data, Location location) {
         if (!material.isBlock())
             return false;
 
         BlockState b = location.getBlock().getState();
         b.setType(material);
+        b.setData(data);
         return !RewardsUtil.isBlockUnbreakable(b.getLocation()) && b.update(true);
     }
 

@@ -1,8 +1,6 @@
 package chanceCubes.config;
 
 import chanceCubes.CCubesCore;
-import chanceCubes.blocks.BlockChanceCube;
-import chanceCubes.blocks.BlockChanceCube.EnumTexture;
 import chanceCubes.registry.ChanceCubeRegistry;
 import chanceCubes.registry.GiantCubeRegistry;
 import chanceCubes.rewards.defaultRewards.BasicReward;
@@ -232,7 +230,7 @@ public class CustomRewardsLoader {
     }
 
     public List<IRewardType> loadCommandReward(JsonArray rawReward, List<IRewardType> rewards) {
-        List<CommandPart> commands = new ArrayList<CommandPart>();
+        List<CommandPart> commands = new ArrayList<>();
         for (JsonElement element : rawReward) {
             CommandPart command = new CommandPart(element.getAsJsonObject().get("command").getAsString());
 
@@ -298,6 +296,7 @@ public class CustomRewardsLoader {
                         boolean removed = ChanceCubeRegistry.INSTANCE.unregisterReward(reward.getAsString());
                         if (!removed)
                             removed = GiantCubeRegistry.INSTANCE.unregisterReward(reward.getAsString());
+
                         CCubesCore.instance().getLogger().log(Level.WARNING, "The reward " + reward.getAsString() + " has been disabled by the mod author due to a bug or some other reason.");
                     }
                 }
@@ -306,7 +305,7 @@ public class CustomRewardsLoader {
     }
 
     public List<IRewardType> loadEntityReward(JsonArray rawReward, List<IRewardType> rewards) {
-        List<EntityPart> entities = new ArrayList<EntityPart>();
+        List<EntityPart> entities = new ArrayList<>();
         for (JsonElement element : rawReward) {
             EntityPart ent;
 
@@ -396,9 +395,6 @@ public class CustomRewardsLoader {
                     if (this.compareDates(start, today) >= 0 && this.compareDates(end, today) <= 0) {
                         CCubesSettings.hasHolidayTexture = true;
                         CCubesSettings.holidayTextureName = holiday.getAsJsonObject().get("Name").getAsString();
-                        for (EnumTexture t : EnumTexture.values())
-                            if (t.getName().equalsIgnoreCase(CCubesSettings.holidayTextureName))
-                                BlockChanceCube.textureToSet = t;
                     }
                 }
                 catch (ParseException e) {

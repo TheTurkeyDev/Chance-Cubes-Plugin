@@ -6,16 +6,16 @@ import chanceCubes.config.CCubesSettings;
 import chanceCubes.util.RewardsUtil;
 import net.minecraft.server.v1_10_R1.Block;
 import net.minecraft.server.v1_10_R1.BlockPosition;
-import net.minecraft.server.v1_10_R1.IBlockData;
 import net.minecraft.server.v1_10_R1.SoundCategory;
 import net.minecraft.server.v1_10_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_10_R1.util.CraftMagicNumbers;
+import org.bukkit.material.MaterialData;
 
 public class OffsetBlock {
 
@@ -23,43 +23,29 @@ public class OffsetBlock {
     public int xOff;
     public int yOff;
     public int zOff;
-    protected Block block;
+    protected Material material;
+    protected MaterialData materialData;
     protected boolean causeUpdate = false;
     protected int delay = 0;
     protected boolean falling;
     protected boolean relativeToPlayer = false;
-    protected IBlockData state = null;
 
-    public OffsetBlock(int x, int y, int z, Block b, boolean falling) {
-        this.xOff = x;
-        this.yOff = y;
-        this.zOff = z;
-        this.block = b;
-        this.falling = falling;
-        this.state = b.getBlockData();
+    public OffsetBlock(int x, int y, int z, Material m, MaterialData materialData, boolean falling) {
+        this(x, y, z, m, falling, materialData, 0);
     }
 
-    public OffsetBlock(int x, int y, int z, Block b, boolean falling, int delay) {
+    public OffsetBlock(int x, int y, int z, Material m, boolean falling, MaterialData materialData, int delay) {
         this.xOff = x;
         this.yOff = y;
         this.zOff = z;
-        this.block = b;
+        this.material = m;
         this.falling = falling;
         this.delay = delay;
-        this.state = b.getBlockData();
+        this.materialData = materialData;
     }
 
-    public Block getBlock() {
-        return this.block;
-    }
-
-    public IBlockData getBlockState() {
-        return this.state;
-    }
-
-    public OffsetBlock setBlockState(IBlockData state) {
-        this.state = state;
-        return this;
+    public Material getMaterial() {
+        return this.material;
     }
 
     public int getDelay() {
@@ -97,8 +83,7 @@ public class OffsetBlock {
             zz += zOff;
         }
 
-        RewardsUtil.placeBlock(location.getBlock().getState());
-        Sound.valueOf("BLOCK_" + new Location(location.getWorld(), xx, yy - 1, zz).getBlock().getType().toString() + "_PLACE");
+        RewardsUtil.placeBlock(material, materialData, location);
         net.minecraft.server.v1_10_R1.World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = location.getChunk();
         Block bSurface = new net.minecraft.server.v1_10_R1.Chunk(world, chunk.getX(), chunk.getZ()).getBlockData(new BlockPosition(xx, yy - 1, zz)).getBlock();
@@ -122,7 +107,7 @@ public class OffsetBlock {
         }
 
         WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockFallingCustom entityfallingblock = new BlockFallingCustom(world, ((double) (location.getBlockX() + xOff)) + 0.5, yy, ((double) (location.getBlockZ() + zOff)) + 0.5, this.state, location.getBlockY() + yOff, this);
+        BlockFallingCustom entityfallingblock = new BlockFallingCustom(world, (location.getX() + xOff) + 0.5, yy, (location.getZ() + zOff) + 0.5, CraftMagicNumbers.getBlock(material).fromLegacyData(materialData.getData()), location.getBlockY() + yOff, this);
         world.addEntity(entityfallingblock);
     }
 

@@ -4,13 +4,11 @@ import chanceCubes.CCubesCore;
 import chanceCubes.util.RewardsUtil;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.DoubleChest;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class InventoryChestReward implements IChanceCubeReward {
 
@@ -26,43 +24,35 @@ public class InventoryChestReward implements IChanceCubeReward {
 
     @Override
     public void trigger(Location location, final Player player) {
-        final List<ItemStack> stacks = new ArrayList<ItemStack>();
-        for (ItemStack stack : player.inventory.mainInventory.clone())
+        final List<ItemStack> stacks = new ArrayList<>();
+        for (ItemStack stack : player.getInventory())
             if (stack != null)
                 stacks.add(stack);
 
-        ItemStack[] armor = player.inventory.armorInventory.clone();
-        player.inventory.clear();
-        for (int i = 0; i < armor.length; i++)
-            player.inventory.armorInventory[i] = armor[i];
+        //This does not clear armor contents
+        player.getInventory().clear();
+        player.sendMessage("At least i didn't delete your items...");
+        RewardsUtil.placeBlock(Material.CHEST, location);
+        RewardsUtil.placeBlock(Material.CHEST, location.clone().add(1, 0, 0));
+        RewardsUtil.placeBlock(Material.OBSIDIAN, location.clone().add(0, -1, 0));
+        RewardsUtil.placeBlock(Material.OBSIDIAN, location.clone().add(1, -1, 0));
+        RewardsUtil.placeBlock(Material.OBSIDIAN, location.clone().add(-1, 0, 0));
+        RewardsUtil.placeBlock(Material.OBSIDIAN, location.clone().add(2, 0, 0));
+        RewardsUtil.placeBlock(Material.OBSIDIAN, location.clone().add(0, 0, 1));
+        RewardsUtil.placeBlock(Material.OBSIDIAN, location.clone().add(1, 0, 1));
+        RewardsUtil.placeBlock(Material.OBSIDIAN, location.clone().add(0, 0, -1));
+        RewardsUtil.placeBlock(Material.OBSIDIAN, location.clone().add(1, 0, -1));
+        RewardsUtil.placeBlock(Material.OBSIDIAN, location.clone().add(0, -1, 0));
+        RewardsUtil.placeBlock(Material.OBSIDIAN, location.clone().add(1, -1, 0));
+        RewardsUtil.placeBlock(Material.OBSIDIAN, location.clone().add(0, 1, 0));
+        RewardsUtil.placeBlock(Material.OBSIDIAN, location.clone().add(1, 1, 0));
 
-        player.addChatMessage(new TextComponentString("At least i didnt delete your items..."));
-
-        RewardsUtil.placeBlock(Blocks.CHEST.getDefaultState(), world, pos);
-        RewardsUtil.placeBlock(Blocks.CHEST.getDefaultState(), world, pos.add(1, 0, 0));
-        RewardsUtil.placeBlock(Blocks.OBSIDIAN.getDefaultState(), world, pos.add(0, -1, 0));
-        RewardsUtil.placeBlock(Blocks.OBSIDIAN.getDefaultState(), world, pos.add(1, -1, 0));
-        RewardsUtil.placeBlock(Blocks.OBSIDIAN.getDefaultState(), world, pos.add(-1, 0, 0));
-        RewardsUtil.placeBlock(Blocks.OBSIDIAN.getDefaultState(), world, pos.add(2, 0, 0));
-        RewardsUtil.placeBlock(Blocks.OBSIDIAN.getDefaultState(), world, pos.add(0, 0, 1));
-        RewardsUtil.placeBlock(Blocks.OBSIDIAN.getDefaultState(), world, pos.add(1, 0, 1));
-        RewardsUtil.placeBlock(Blocks.OBSIDIAN.getDefaultState(), world, pos.add(0, 0, -1));
-        RewardsUtil.placeBlock(Blocks.OBSIDIAN.getDefaultState(), world, pos.add(1, 0, -1));
-        RewardsUtil.placeBlock(Blocks.OBSIDIAN.getDefaultState(), world, pos.add(0, -1, 0));
-        RewardsUtil.placeBlock(Blocks.OBSIDIAN.getDefaultState(), world, pos.add(1, -1, 0));
-        RewardsUtil.placeBlock(Blocks.OBSIDIAN.getDefaultState(), world, pos.add(0, 1, 0));
-        RewardsUtil.placeBlock(Blocks.OBSIDIAN.getDefaultState(), world, pos.add(1, 1, 0));
-
-        TileEntityChest chest = (TileEntityChest) world.getTileEntity(pos);
-
+        DoubleChest chest = (DoubleChest) location.getBlock();
         for (int i = 0; i < stacks.size(); i++) {
-            if (i > chest.getSizeInventory() * 2)
+            if (i > chest.getInventory().getSize() * 2)
                 return;
-            else if (i > chest.getSizeInventory())
-                chest = (TileEntityChest) world.getTileEntity(pos.add(1, 0, 0));
 
-            chest.setInventorySlotContents(i % chest.getSizeInventory(), stacks.get(i));
+            chest.getInventory().addItem(stacks.toArray(new ItemStack[0]));
         }
     }
-
 }

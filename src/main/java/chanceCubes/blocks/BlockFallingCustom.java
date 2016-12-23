@@ -2,11 +2,19 @@ package chanceCubes.blocks;
 
 import chanceCubes.rewards.rewardparts.OffsetBlock;
 import net.minecraft.server.v1_10_R1.Block;
+import net.minecraft.server.v1_10_R1.BlockFalling;
 import net.minecraft.server.v1_10_R1.BlockPosition;
 import net.minecraft.server.v1_10_R1.Blocks;
 import net.minecraft.server.v1_10_R1.EntityFallingBlock;
+import net.minecraft.server.v1_10_R1.EnumDirection;
 import net.minecraft.server.v1_10_R1.IBlockData;
+import net.minecraft.server.v1_10_R1.ITileEntity;
+import net.minecraft.server.v1_10_R1.ItemStack;
+import net.minecraft.server.v1_10_R1.NBTBase;
+import net.minecraft.server.v1_10_R1.NBTTagCompound;
+import net.minecraft.server.v1_10_R1.TileEntity;
 import net.minecraft.server.v1_10_R1.World;
+import org.bukkit.Location;
 
 public class BlockFallingCustom extends EntityFallingBlock {
 
@@ -19,89 +27,80 @@ public class BlockFallingCustom extends EntityFallingBlock {
         fallTile = state;
         this.normY = normY;
         this.osb = osb;
+        ticksLived = 1;
     }
 
-    public void onUpdate() {
-        Block block = this.fallTile.getBlock();
+    @Override
+    public void m() {
+        Block block = fallTile.getBlock();
 
-        if (this.fallTile.getBlock() == Blocks.AIR) {
-            this.die();
+        if (fallTile.getBlock() == Blocks.AIR) {
+            die();
         }
         else {
-            this.lastX = this.locX;
-            this.lastY = this.locY;
-            this.lastZ = this.locZ;
+            lastX = locX;
+            lastY = locY;
+            lastZ = locZ;
 
-            if (this.ticksLived++ == 0) {
+            if (ticksLived++ == 0) {
                 BlockPosition blockpos = new BlockPosition(this);
-                
-                if (this.world.c(blockpos).getBlock() == block) {
-                    this.world.setAir(blockpos);
-                }
-                //TODO unneeded check, may delete in the future
-                else if (this.world.isClientSide) {
-                    this.die();
-                    return;
+                if (world.c(blockpos).getBlock() == block) {
+                    world.setAir(blockpos);
                 }
             }
 
-            this.motY -= 0.04D;
-            this.move(this.motX, this.motY, this.motZ);
-            this.motX *= 0.98D;
-            this.motY *= 0.98D;
-            this.motZ *= 0.98D;
-            
-            //TODO unneeded check, may delete in the future
-            if (!this.world.isClientSide) {
-                /*BlockPosition blockpos1 = new BlockPosition(this);
+            motY -= 0.04D;
+            move(motX, motY, motZ);
+            motX *= 0.98D;
+            motY *= 0.98D;
+            motZ *= 0.98D;
 
-                if (this.onGround) {
-                    IBlockState iblockstate = this.worldObj.getBlockState(blockpos1);
+            BlockPosition blockpos = new BlockPosition(this);
+            if (onGround) {
+                IBlockData iBlockData = world.c(blockpos);
 
-                    this.motionX *= 0.7D;
-                    this.motionZ *= 0.7D;
-                    this.motionY *= -0.5D;
+                motX *= 0.7D;
+                motZ *= 0.7D;
+                motY *= -0.5D;
 
-                    if (iblockstate.getBlock() != Blocks.PISTON_EXTENSION) {
-                        this.setDead();
-                        if (this.worldObj.canBlockBePlaced(block, blockpos1, true, EnumFacing.UP, (Entity) null, (ItemStack) null) && !BlockFalling.canFallThrough(this.worldObj.getBlockState(blockpos1.down())) && this.worldObj.setBlockState(blockpos1, this.fallTile, 3)) {
-                            if (block instanceof BlockFalling)
-                                osb.placeInWorld(worldObj, blockpos1, false);
+                if (iBlockData.getBlock() != Blocks.PISTON_EXTENSION) {
+                    die();
+                    if (world.a(block, blockpos, true, EnumDirection.UP, null, null) && !BlockFalling.i(world.c(blockpos.down())) && world.setTypeAndData(blockpos, fallTile, 3)) {
+                        if (block instanceof BlockFalling)
+                            osb.placeInWorld(new Location(world.getWorld(), blockpos.getX(), blockpos.getY(), blockpos.getZ()), false);
 
-                            if (this.tileEntityData != null && block instanceof ITileEntityProvider) {
-                                TileEntity tileentity = this.worldObj.getTileEntity(blockpos1);
+                        if (tileEntityData != null && block instanceof ITileEntity) {
+                            TileEntity tileentity = world.getTileEntity(blockpos);
 
-                                if (tileentity != null) {
-                                    NBTTagCompound nbttagcompound = new NBTTagCompound();
-                                    tileentity.writeToNBT(nbttagcompound);
+                            if (tileentity != null) {
+                                NBTTagCompound nbttagcompound = new NBTTagCompound();
+                                tileentity.save(nbttagcompound);
 
-                                    for (String s : this.tileEntityData.getKeySet()) {
-                                        NBTBase nbtbase = this.tileEntityData.getTag(s);
+                                for (String s : tileEntityData.c()) {
+                                    NBTBase nbtbase = tileEntityData.get(s);
 
-                                        if (!s.equals("x") && !s.equals("y") && !s.equals("z"))
-                                            nbttagcompound.setTag(s, nbtbase.copy());
-                                    }
-
-                                    tileentity.readFromNBT(nbttagcompound);
-                                    tileentity.markDirty();
+                                    if (!s.equals("x") && !s.equals("y") && !s.equals("z"))
+                                        nbttagcompound.set(s, nbtbase.clone());
                                 }
+
+                                tileentity.a(nbttagcompound);
+                                tileentity.update();
                             }
                         }
-                        else if (this.shouldDropItem && this.worldObj.getGameRules().getBoolean("doEntityDrops")) {
-                            this.entityDropItem(new ItemStack(block, 1, block.damageDropped(this.fallTile)), 0.0F);
-                        }
                     }
+                    else if (dropItem && world.getGameRules().getBoolean("doEntityDrops"))
+                        a(new ItemStack(block, 1, block.getDropData(fallTile)), 0.0F);
                 }
-                else if (this.ticksLived > 100 && !this.worldObj.isRemote && (blockpos1.getY() < 1 || blockpos1.getY() > 256) || this.fallTime > 600) {
-                    if (this.shouldDropItem && this.worldObj.getGameRules().getBoolean("doEntityDrops"))
-                        this.entityDropItem(new ItemStack(block, 1, block.damageDropped(this.fallTile)), 0.0F);
+            }
+            else if (ticksLived > 100 && (blockpos.getY() < 1 || blockpos.getY() > 256) || ticksLived > 600) {
+                if (dropItem && world.getGameRules().getBoolean("doEntityDrops"))
+                    a(new ItemStack(block, 1, block.getDropData(fallTile)), 0.0F);
 
-                    this.setDead();
-                }
-                else if (normY == blockpos1.getY() || this.motionY == 0) {
-                    this.setDead();
-                    osb.placeInWorld(worldObj, blockpos1, false);
-                }*/
+                die();
+            }
+            else if (normY == blockpos.getY() || motY == 0) {
+                die();
+                osb.placeInWorld(new Location(world.getWorld(), blockpos.getX(), blockpos.getY(), blockpos.getZ()), false);
             }
         }
     }

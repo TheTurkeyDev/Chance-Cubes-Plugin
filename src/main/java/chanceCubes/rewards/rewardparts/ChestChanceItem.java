@@ -1,6 +1,5 @@
 package chanceCubes.rewards.rewardparts;
 
-import chanceCubes.blocks.CCubesBlocks;
 import chanceCubes.util.RewardsUtil;
 import java.util.Random;
 import net.minecraft.item.ItemStack;

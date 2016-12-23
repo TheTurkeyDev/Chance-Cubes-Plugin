@@ -1,7 +1,5 @@
 package chanceCubes.containers;
 
-import chanceCubes.blocks.CCubesBlocks;
-import chanceCubes.items.ItemChanceCube;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;

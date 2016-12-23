@@ -2,7 +2,6 @@ package chanceCubes.network;
 
 import chanceCubes.CCubesCore;
 import chanceCubes.containers.CreativePendantContainer;
-import chanceCubes.items.ItemChanceCube;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;

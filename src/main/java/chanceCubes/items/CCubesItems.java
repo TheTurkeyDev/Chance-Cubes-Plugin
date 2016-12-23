@@ -195,4 +195,7 @@ public class CCubesItems {
         mesher.register(CCubesItems.scanner, 0, new ModelResourceLocation(CCubesCore.MODID + ":" + CCubesItems.scanner.getItemName(), "inventory"));*/
     }
 
+    public static boolean isChanceCube(ItemStack itemStack) {
+        return itemStack.isSimilar(chanceCube) || itemStack.isSimilar(chanceIcosahedron) || itemStack.isSimilar(giantChanceCube);
+    }
 }

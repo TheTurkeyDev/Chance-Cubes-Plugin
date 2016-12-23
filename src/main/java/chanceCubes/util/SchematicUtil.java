@@ -44,7 +44,7 @@ public class SchematicUtil {
     }
 
     public static OffsetTileEntity OffsetBlockToTileEntity(OffsetBlock osb, NBTTagCompound nbt) {
-        OffsetTileEntity oste = new OffsetTileEntity(osb.xOff, osb.yOff, osb.zOff, osb.getBlock(), nbt, osb.isFalling(), osb.getDelay());
+        OffsetTileEntity oste = new OffsetTileEntity(osb.xOff, osb.yOff, osb.zOff, osb.getMaterial(), nbt, osb.isFalling(), osb.getDelay());
         oste.setBlockState(osb.getBlockState());
         oste.setDelay(osb.getDelay());
         oste.setRelativeToPlayer(osb.isRelativeToPlayer());
@@ -232,7 +232,7 @@ public class SchematicUtil {
 
         for (int i = offsetBlocks.size() - 1; i >= 0; i--) {
             OffsetBlock osb = offsetBlocks.get(i);
-            if (osb.getBlock().equals(Blocks.AIR) && !includeAirBlocks)
+            if (osb.getMaterial().equals(Blocks.AIR) && !includeAirBlocks)
                 offsetBlocks.remove(i);
         }
 
@@ -294,7 +294,7 @@ public class SchematicUtil {
                     Block b = null;
                     for (OffsetBlock osb : offsetBlocks)
                         if (osb.xOff == tileentity.getPos().getX() && osb.yOff == tileentity.getPos().getY() && osb.zOff == tileentity.getPos().getZ())
-                            b = osb.getBlock();
+                            b = osb.getMaterial();
                     if (b == null)
                         b = Blocks.STONE;
                     OffsetTileEntity block = new OffsetTileEntity(tileentity.getPos().getX(), tileentity.getPos().getY(), tileentity.getPos().getZ(), b, nbttagcompound4, falling);

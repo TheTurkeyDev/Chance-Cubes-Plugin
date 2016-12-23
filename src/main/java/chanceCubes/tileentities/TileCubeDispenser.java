@@ -1,7 +1,6 @@
 package chanceCubes.tileentities;
 
 import chanceCubes.blocks.BlockCubeDispenser.DispenseType;
-import chanceCubes.blocks.CCubesBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;

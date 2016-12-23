@@ -1,19 +1,18 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
-import chanceCubes.util.CCubesAchievements;
 import chanceCubes.util.RewardsUtil;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
 import java.util.Random;
-import net.minecraft.block.BlockCake;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.MobEffects;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.material.Cake;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class CakeIsALieReward implements IChanceCubeReward {
 
@@ -30,50 +29,41 @@ public class CakeIsALieReward implements IChanceCubeReward {
     }
 
     @Override
-    public void trigger(final Location location, final final Player player) {
-        RewardsUtil.sendMessageToNearPlayers(world, pos, 32, "But is it a lie?");
-
-        RewardsUtil.placeBlock(Blocks.CAKE.getDefaultState(), world, pos);
-
-        if (random.nextInt(3) == 1) {
-            Task task = new Task("Cake_Is_A_Lie", 20) {
-                @Override
-                public void callback() {
-                    update(0, world, pos, player);
-                }
-            };
-            Scheduler.scheduleTask(task);
-        }
+    public void trigger(final Location location, final Player player) {
+        RewardsUtil.sendMessageToNearPlayers(location, 32, "But is it a lie?");
+        RewardsUtil.placeBlock(Material.CAKE_BLOCK, location);
+        if (random.nextInt(3) == 1)
+            RewardsUtil.scheduleTask(() -> update(0, location, player), 20);
     }
 
-    public void update(final int iteration, final Location location, final final Player player) {
-        if (!world.getBlockState(pos).getBlock().equals(Blocks.CAKE))
+    public void update(final int iteration, final Location location, final Player player) {
+        Block block = location.getBlock();
+        if (block.getType() != Material.CAKE_BLOCK)
             return;
-        if (world.getBlockState(pos).getValue(BlockCake.BITES) > 0) {
-            world.setBlockToAir(pos);
-            RewardsUtil.sendMessageToNearPlayers(world, pos, 32, "It's a lie!!!");
-            EntityCreeper creeper = new EntityCreeper(world);
-            creeper.setLocationAndAngles(pos.getX(), pos.getY(), pos.getZ(), pos.getX() == 1 ? 90 : -90, 0);
+
+        if (((Cake) block.getState().getData()).getSlicesEaten() > 0) {
+            BlockState bs = block.getState();
+            bs.setType(Material.AIR);
+            bs.update(true);
+            RewardsUtil.sendMessageToNearPlayers(location, 32, "It's a lie!!!");
+            Creeper creeper = (Creeper) location.getWorld().spawnEntity(location, EntityType.CREEPER);
             if (random.nextInt(10) == 1)
-                creeper.onStruckByLightning(null);
-            creeper.addPotionEffect(new PotionEffect(MobEffects.SPEED, 9999, 2));
-            creeper.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 60, 999));
-            world.spawnEntityInWorld(creeper);
-            player.addStat(CCubesAchievements.itsALie);
+                creeper.setPowered(true);
+
+            creeper.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 9999, 2));
+            creeper.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 999));
+            //TODO need to work on custom achievements
+            //player.addStat(CCubesAchievements.itsALie);
             return;
         }
 
         if (iteration == 300) {
-            world.setBlockToAir(pos);
+            BlockState bs = block.getState();
+            bs.setType(Material.AIR);
+            bs.update(true);
             return;
         }
 
-        Task task = new Task("Cake_Is_A_Lie", 20) {
-            @Override
-            public void callback() {
-                update(iteration + 1, world, pos, player);
-            }
-        };
-        Scheduler.scheduleTask(task);
+        RewardsUtil.scheduleTask(() -> update(iteration + 1, location, player), 20);
     }
 }

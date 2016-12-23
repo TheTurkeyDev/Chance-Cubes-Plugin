@@ -1,61 +1,93 @@
 package chanceCubes.util;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.command.CommandResultStats.Type;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import java.util.Set;
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.command.CommandSender;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.Plugin;
 
-public class CCubesCommandSender implements ICommandSender {
+public class CCubesCommandSender implements CommandSender {
 
-    BlockPos blockLoc;
-    EntityPlayer harvester;
-
-    public CCubesCommandSender(EntityPlayer player, BlockPos pos) {
-        blockLoc = pos;
-        harvester = player;
-    }
-
-    @Override
-    public void addChatMessage(ITextComponent p_145747_1_) {
+    public CCubesCommandSender() {
 
     }
 
     @Override
-    public boolean canCommandSenderUseCommand(int permLevel, String commandName) {
+    public boolean isOp() {
         return true;
     }
 
-    @SideOnly(Side.CLIENT)
-    public int func_145751_f() {
-        return 0;
-    }
+    @Override
+    public void setOp(boolean value) {
 
-    @SideOnly(Side.CLIENT)
-    public void func_145757_a(ByteBuf p_145757_1_) {
     }
 
     @Override
-    public Entity getCommandSenderEntity() {
-        return harvester;
+    public boolean isPermissionSet(String name) {
+        return true;
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-        return new TextComponentString(this.getName());
+    public boolean isPermissionSet(Permission perm) {
+        return true;
     }
 
     @Override
-    public World getEntityWorld() {
-        return harvester != null ? harvester.worldObj : null;
+    public boolean hasPermission(String name) {
+        return true;
+    }
+
+    @Override
+    public boolean hasPermission(Permission perm) {
+        return true;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value) {
+        return null;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin) {
+        return null;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value, int ticks) {
+        return null;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin, int ticks) {
+        return null;
+    }
+
+    @Override
+    public void removeAttachment(PermissionAttachment attachment) {
+
+    }
+
+    @Override
+    public void recalculatePermissions() {
+
+    }
+
+    @Override
+    public Set<PermissionAttachmentInfo> getEffectivePermissions() {
+        return null;
+    }
+
+    @Override
+    public void sendMessage(String message) {
+
+    }
+
+    @Override
+    public void sendMessage(String... message) {
+
     }
 
     @Override
@@ -64,27 +96,7 @@ public class CCubesCommandSender implements ICommandSender {
     }
 
     @Override
-    public BlockPos getPosition() {
-        return blockLoc;
-    }
-
-    @Override
-    public Vec3d getPositionVector() {
-        return new Vec3d(blockLoc.getX(), blockLoc.getY(), blockLoc.getZ());
-    }
-
-    @Override
-    public MinecraftServer getServer() {
-        return harvester.getEntityWorld().getMinecraftServer();
-    }
-
-    @Override
-    public boolean sendCommandFeedback() {
-        return false;
-    }
-
-    @Override
-    public void setCommandStat(Type type, int amount) {
-
+    public Server getServer() {
+        return Bukkit.getServer();
     }
 }

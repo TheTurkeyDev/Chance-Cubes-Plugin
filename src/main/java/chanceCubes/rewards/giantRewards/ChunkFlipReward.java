@@ -1,7 +1,6 @@
 package chanceCubes.rewards.giantRewards;
 
 import chanceCubes.CCubesCore;
-import chanceCubes.blocks.CCubesBlocks;
 import chanceCubes.rewards.defaultRewards.IChanceCubeReward;
 import chanceCubes.sounds.CCubesSounds;
 import chanceCubes.util.Scheduler;

@@ -1,7 +1,6 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
-import chanceCubes.blocks.CCubesBlocks;
 import chanceCubes.util.RewardsUtil;
 import java.util.Random;
 import net.minecraft.block.BlockColored;

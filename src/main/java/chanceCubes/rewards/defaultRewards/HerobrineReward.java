@@ -1,17 +1,14 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
-import chanceCubes.util.CCubesAchievements;
 import chanceCubes.util.CCubesCommandSender;
 import chanceCubes.util.RewardsUtil;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import java.util.Random;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 public class HerobrineReward implements IChanceCubeReward {
 
@@ -28,51 +25,40 @@ public class HerobrineReward implements IChanceCubeReward {
         return CCubesCore.instance().getName().toLowerCase() + ":Herobrine";
     }
 
-    private void schedule(final Location location, final final Player player, final int stage, final boolean staying) {
-        Task task = new Task("Herobrine Reward", 40) {
-            @Override
-            public void callback() {
-                update(world, pos, player, stage, staying);
-            }
-
-        };
-
-        Scheduler.scheduleTask(task);
+    private void schedule(final Location location, final Player player, final int stage, final boolean staying) {
+        RewardsUtil.scheduleTask(() -> update(location, player, stage, staying), 40);
     }
 
     @Override
     public void trigger(Location location, Player player) {
-        update(world, pos, player, 0, world.rand.nextInt(5) == 1);
+        update(location, player, 0, new Random().nextInt(5) == 1);
     }
 
     private void update(Location location, Player player, int stage, boolean staying) {
         switch (stage) {
             case 0: {
-                RewardsUtil.sendMessageToAllPlayers(world, TextFormatting.YELLOW + "Herobrine joined the game.");
+                RewardsUtil.sendMessageToAllPlayers(location.getWorld(), ChatColor.YELLOW + "Herobrine joined the game.");
                 break;
             }
             case 1: {
                 if (staying)
-                    RewardsUtil.sendMessageToAllPlayers(world, "<Herobrine> " + staySayings[world.rand.nextInt(staySayings.length)]);
+                    RewardsUtil.sendMessageToAllPlayers(location.getWorld(), "<Herobrine> " + staySayings[new Random().nextInt(staySayings.length)]);
                 else
-                    RewardsUtil.sendMessageToAllPlayers(world, "<Herobrine> " + leaveSayings[world.rand.nextInt(leaveSayings.length)]);
+                    RewardsUtil.sendMessageToAllPlayers(location.getWorld(), "<Herobrine> " + leaveSayings[new Random().nextInt(leaveSayings.length)]);
+
                 break;
             }
             case 2: {
                 if (staying) {
-                    RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(0, 1, 0));
-                    MinecraftServer server = world.getMinecraftServer();
-                    Boolean rule = server.worldServers[0].getGameRules().getBoolean("commandBlockOutput");
-                    server.worldServers[0].getGameRules().setOrCreateGameRule("commandBlockOutput", "false");
-                    String command = "/summon Zombie ~ ~1 ~ {CustomName:\"Herobrine\",CustomNameVisible:1,IsVillager:0,IsBaby:0,CanBreakDoors:1,ArmorItems:[{id:diamond_boots,Count:1,tag:{Unbreakable:1,ench:[{id:0,lvl:5}]}},{id:diamond_leggings,Count:1,tag:{Unbreakable:1,ench:[{id:0,lvl:5}]}},{id:diamond_chestplate,Count:1,tag:{Unbreakable:1,ench:[{id:0,lvl:5}]}},{id:diamond_helmet,Count:1,tag:{Unbreakable:1,ench:[{id:0,lvl:5}]}}],HandItems:[{id:diamond_sword,Count:1,tag:{Unbreakable:1,display:{Name:\"Wrath of Herobrine\"},ench:[{id:16,lvl:5}]}},{}],ArmorDropChances:[0.0F,0.0F,0.0F,0.0F],HandDropChances:[2.0F,0.085F],Attributes:[{Name:generic.maxHealth,Base:500}],Health:500.0f,Glowing:1b}";
-                    CCubesCommandSender sender = new CCubesCommandSender(player, pos);
-                    server.getCommandManager().executeCommand(sender, command);
-                    server.worldServers[0].getGameRules().setOrCreateGameRule("commandBlockOutput", rule.toString());
-                    player.addStat(CCubesAchievements.herobrine);
+                    RewardsUtil.placeBlock(Material.AIR, location.clone().add(0, 1, 0));
+                    String command = "summon Zombie ~ ~1 ~ {CustomName:\"Herobrine\",CustomNameVisible:1,IsVillager:0,IsBaby:0,CanBreakDoors:1,ArmorItems:[{id:diamond_boots,Count:1,tag:{Unbreakable:1,ench:[{id:0,lvl:5}]}},{id:diamond_leggings,Count:1,tag:{Unbreakable:1,ench:[{id:0,lvl:5}]}},{id:diamond_chestplate,Count:1,tag:{Unbreakable:1,ench:[{id:0,lvl:5}]}},{id:diamond_helmet,Count:1,tag:{Unbreakable:1,ench:[{id:0,lvl:5}]}}],HandItems:[{id:diamond_sword,Count:1,tag:{Unbreakable:1,display:{Name:\"Wrath of Herobrine\"},ench:[{id:16,lvl:5}]}},{}],ArmorDropChances:[0.0F,0.0F,0.0F,0.0F],HandDropChances:[2.0F,0.085F],Attributes:[{Name:generic.maxHealth,Base:500}],Health:500.0f,Glowing:1b}";
+                    Bukkit.dispatchCommand(new CCubesCommandSender(player), command);
+                    //TODO still need to work on custom achievements
+                    //player.addStat(CCubesAchievements.herobrine);
                 }
-                else {
-                    RewardsUtil.sendMessageToAllPlayers(world, TextFormatting.YELLOW + "Herobrine left the game.");
-                }
+                else
+                    RewardsUtil.sendMessageToAllPlayers(location.getWorld(), ChatColor.YELLOW + "Herobrine left the game.");
+
                 break;
             }
         }
@@ -80,6 +66,6 @@ public class HerobrineReward implements IChanceCubeReward {
         stage++;
 
         if (stage < 3)
-            schedule(world, pos, player, stage, staying);
+            schedule(location, player, stage, staying);
     }
 }

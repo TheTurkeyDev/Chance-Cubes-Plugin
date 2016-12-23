@@ -1,6 +1,5 @@
 package chanceCubes.util;
 
-import chanceCubes.blocks.CCubesBlocks;
 import chanceCubes.sounds.CCubesSounds;
 import chanceCubes.tileentities.TileGiantCube;
 import net.minecraft.tileentity.TileEntity;

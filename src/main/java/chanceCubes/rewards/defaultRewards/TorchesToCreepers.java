@@ -2,13 +2,13 @@ package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
 import chanceCubes.util.RewardsUtil;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import java.util.Arrays;
+import java.util.List;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 public class TorchesToCreepers implements IChanceCubeReward {
 
@@ -27,17 +27,19 @@ public class TorchesToCreepers implements IChanceCubeReward {
         for (int yy = -32; yy <= 32; yy++) {
             for (int xx = -32; xx <= 32; xx++) {
                 for (int zz = -32; zz <= 32; zz++) {
-                    IBlockState b = world.getBlockState(pos.add(xx, yy, zz));
-                    if (b.getLightValue(world, pos) > 0 && b.getBlock() != Blocks.LAVA && !b.getBlock().hasTileEntity(b)) {
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(xx, yy, zz));
-                        EntityCreeper creeper = new EntityCreeper(world);
-                        creeper.setLocationAndAngles(pos.getX() + xx + 0.5, pos.getY() + yy, pos.getZ() + zz + 0.5, 0, 0);
-                        world.spawnEntityInWorld(creeper);
+                    Block b = location.clone().add(xx, yy, zz).getBlock();
+                    List<Material> blocks = Arrays.asList(Material.LAVA, Material.STATIONARY_LAVA, Material.CHEST,
+                            Material.TRAPPED_CHEST, Material.DROPPER, Material.DISPENSER, Material.JUKEBOX,
+                            Material.NOTE_BLOCK, Material.MOB_SPAWNER, Material.SIGN_POST, Material.WALL_SIGN,
+                            Material.ENDER_CHEST, Material.BREWING_STAND, Material.HOPPER);
+                    if (b.getLightLevel() > 0 && !blocks.contains(b.getType())) {
+                        RewardsUtil.placeBlock(Material.AIR, location.clone().add(xx, yy, zz));
+                        location.getWorld().spawnEntity(location.clone().add(xx + 0.5, yy, zz + 0.5), EntityType.CREEPER);
                     }
                 }
             }
         }
-        player.addChatMessage(new TextComponentString("Those lights seem a little weird.... O.o"));
-    }
 
+        player.sendMessage("Those lights seem a little weird.... O.o");
+    }
 }

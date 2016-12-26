@@ -2,7 +2,6 @@ package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import org.bukkit.Location;
@@ -46,7 +45,7 @@ public class BookOfMemesReward implements IChanceCubeReward {
         BookMeta meta = (BookMeta) book.getItemMeta();
         meta.setAuthor("Chance Cubes");
         meta.setGeneration(Generation.ORIGINAL);
-        meta.setPages(Collections.singletonList(memes.get(random.nextInt(memes.size()))));
+        meta.setPages(memes.get(random.nextInt(memes.size())));
         meta.setTitle("Book of Memes");
         book.setItemMeta(meta);
         location.getWorld().dropItem(location, book);

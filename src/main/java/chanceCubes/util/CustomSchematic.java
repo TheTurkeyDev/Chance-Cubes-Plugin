@@ -39,7 +39,7 @@ public class CustomSchematic {
         return this.zSize;
     }
 
-    public float getdelay() {
+    public float getDelay() {
         return this.delay;
     }
 

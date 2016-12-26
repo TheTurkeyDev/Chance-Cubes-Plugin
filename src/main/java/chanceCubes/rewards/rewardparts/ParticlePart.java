@@ -1,12 +1,14 @@
 package chanceCubes.rewards.rewardparts;
 
+import org.bukkit.Particle;
+
 public class ParticlePart {
 
     public static String[] elements = new String[]{"particle:I", "x:I", "y:I", "z:I", "delay:I"};
     private int delay = 0;
-    private int particle;
+    private Particle particle;
 
-    public ParticlePart(int particle) {
+    public ParticlePart(Particle particle) {
         this.particle = particle;
     }
 
@@ -18,7 +20,7 @@ public class ParticlePart {
         this.delay = delay;
     }
 
-    public int getParticle() {
+    public Particle getParticle() {
         return particle;
     }
 }

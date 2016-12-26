@@ -1,15 +1,17 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
+import chanceCubes.items.CCubesItems;
 import chanceCubes.util.RewardsUtil;
 import java.util.Random;
-import net.minecraft.block.BlockColored;
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.EnumDyeColor;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import org.bukkit.DyeColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
+import org.bukkit.material.MaterialData;
+import org.bukkit.material.Wool;
 
 public class DiscoReward implements IChanceCubeReward {
 
@@ -28,19 +30,17 @@ public class DiscoReward implements IChanceCubeReward {
     @Override
     public void trigger(Location location, Player player) {
         for (int xx = -4; xx < 5; xx++)
-            for (int zz = -4; zz < 5; zz++)
-                RewardsUtil.placeBlock(Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.byMetadata(rand.nextInt(16))), world, pos.add(xx, -1, zz));
+            for (int zz = -4; zz < 5; zz++) {
+                RewardsUtil.placeBlock(Material.WOOL, new Wool(DyeColor.values()[rand.nextInt(16)]), location.clone().add(xx, -1, zz));
+            }
 
         for (int i = 0; i < 10; i++) {
-            EntitySheep sheep = new EntitySheep(world);
-            sheep.setCustomNameTag("jeb_");
-            sheep.setLocationAndAngles(pos.getX(), pos.getY() + 1, pos.getZ(), 0, 0);
-            world.spawnEntityInWorld(sheep);
+            Sheep sheep = (Sheep) location.getWorld().spawnEntity(location.clone().add(0, 1, 0), EntityType.SHEEP);
+            sheep.setCustomName("jeb_");
+            sheep.setCustomNameVisible(true);
         }
 
-        RewardsUtil.placeBlock(CCubesBlocks.CHANCE_ICOSAHEDRON.getDefaultState(), world, pos.add(0, 3, 0));
-
-        RewardsUtil.sendMessageToNearPlayers(world, pos, 32, "Disco Party!!!!");
+        RewardsUtil.placeBlock(CCubesItems.chanceIcosahedron.getType(), new MaterialData(CCubesItems.chanceIcosahedron.getType()), location.clone().add(0, 3, 0));
+        RewardsUtil.sendMessageToNearPlayers(location, 32, "Disco Party!!!!");
     }
-
 }

@@ -31,7 +31,7 @@ public class CakeIsALieReward implements IChanceCubeReward {
     @Override
     public void trigger(final Location location, final Player player) {
         RewardsUtil.sendMessageToNearPlayers(location, 32, "But is it a lie?");
-        RewardsUtil.placeBlock(Material.CAKE_BLOCK, location);
+        RewardsUtil.placeBlock(Material.CAKE_BLOCK, new Cake(), location);
         if (random.nextInt(3) == 1)
             RewardsUtil.scheduleTask(() -> update(0, location, player), 20);
     }

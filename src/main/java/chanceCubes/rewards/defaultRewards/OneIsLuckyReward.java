@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 
 public class OneIsLuckyReward implements IChanceCubeReward {
@@ -30,13 +31,13 @@ public class OneIsLuckyReward implements IChanceCubeReward {
     public void trigger(final Location location, final Player player) {
         RewardsUtil.sendMessageToNearPlayers(location, 32, "A Lucky Block Salute");
         boolean leftLucky = random.nextBoolean();
-        if (RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), location.clone().add(-1, 0, 0))) {
+        if (RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), new MaterialData(CCubesItems.chanceCube.getType()), location.clone().add(-1, 0, 0))) {
             BlockState chanceCube = location.clone().add(-1, 0, 0).getBlock().getState();
             chanceCube.setMetadata("ChanceCubes-Chance", new FixedMetadataValue(CCubesCore.instance(), leftLucky ? 100 : -100));
             chanceCube.update(true);
         }
 
-        if (RewardsUtil.placeBlock(Material.SIGN_POST, location)) {
+        if (RewardsUtil.placeBlock(Material.SIGN_POST, new org.bukkit.material.Sign(), location)) {
             Sign sign = (Sign) location.getBlock().getState();
             sign.setLine(0, "One is lucky");
             sign.setLine(1, "One is not");
@@ -44,7 +45,7 @@ public class OneIsLuckyReward implements IChanceCubeReward {
             sign.update(true);
         }
 
-        if (RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), location.clone().add(-1, 0, 0))) {
+        if (RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), new MaterialData(CCubesItems.chanceCube.getType()), location.clone().add(-1, 0, 0))) {
             BlockState chanceCube = location.clone().add(-1, 0, 0).getBlock().getState();
             chanceCube.setMetadata("ChanceCubes-Chance", new FixedMetadataValue(CCubesCore.instance(), !leftLucky ? 100 : -100));
             chanceCube.update(true);

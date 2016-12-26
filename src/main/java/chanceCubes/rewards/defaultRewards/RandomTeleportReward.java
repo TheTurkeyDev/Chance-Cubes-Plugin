@@ -1,9 +1,11 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import java.util.Random;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 public class RandomTeleportReward implements IChanceCubeReward {
 
@@ -19,20 +21,21 @@ public class RandomTeleportReward implements IChanceCubeReward {
 
     @Override
     public void trigger(Location location, Player player) {
-        int xChange = ((world.rand.nextInt(50) + 20) + pos.getX()) - 35;
-        int zChange = ((world.rand.nextInt(50) + 20) + pos.getZ()) - 35;
+        int xChange = ((new Random().nextInt(50) + 20) + location.getBlockX()) - 35;
+        int zChange = ((new Random().nextInt(50) + 20) + location.getBlockZ()) - 35;
 
         int yChange = -1;
-
-        for (int yy = 0; yy <= world.getActualHeight(); yy++) {
-            if (world.isAirBlock(new BlockPos(xChange, yy, zChange)) && world.isAirBlock(new BlockPos(xChange, yy + 1, zChange))) {
+        World world = location.getWorld();
+        for (int yy = 0; yy <= world.getMaxHeight(); yy++) {
+            if (new Location(world, xChange, yy, zChange).getBlock().getType() == Material.AIR && new Location(world, xChange, yy + 1, zChange).getBlock().getType() == Material.AIR) {
                 yChange = yy;
                 break;
             }
         }
+
         if (yChange == -1)
             return;
 
-        player.setPositionAndUpdate(xChange, yChange, zChange);
+        player.teleport(new Location(location.getWorld(), xChange, yChange, zChange));
     }
 }

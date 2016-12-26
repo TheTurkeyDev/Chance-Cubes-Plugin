@@ -2,9 +2,8 @@ package chanceCubes.rewards.type;
 
 import chanceCubes.rewards.rewardparts.OffsetBlock;
 import chanceCubes.util.RewardsUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 public class BlockRewardType extends BaseRewardType<OffsetBlock> {
 
@@ -13,12 +12,13 @@ public class BlockRewardType extends BaseRewardType<OffsetBlock> {
     }
 
     @Override
-    protected void trigger(OffsetBlock block, World world, int x, int y, int z, EntityPlayer player) {
+    protected void trigger(OffsetBlock block, Location location, Player player) {
         if (block == null)
             return;
-        if (block.isRelativeToPlayer() && !RewardsUtil.isBlockUnbreakable(world, new BlockPos((int) Math.floor(player.posX), (int) Math.floor(player.posY), (int) Math.floor(player.posZ))))
-            block.spawnInWorld(world, (int) Math.floor(player.posX), (int) Math.floor(player.posY), (int) Math.floor(player.posZ));
-        else if (!RewardsUtil.isBlockUnbreakable(world, new BlockPos(x, y + 3, z)))
-            block.spawnInWorld(world, x, y, z);
+
+        if (block.isRelativeToPlayer() && !RewardsUtil.isBlockUnbreakable(location))
+            block.spawnInWorld(location);
+        else if (!RewardsUtil.isBlockUnbreakable(location.clone().add(0, 3, 0)))
+            block.spawnInWorld(location);
     }
 }

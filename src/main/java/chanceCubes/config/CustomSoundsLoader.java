@@ -1,32 +1,13 @@
 package chanceCubes.config;
 
-import chanceCubes.CCubesCore;
-import chanceCubes.util.FileUtil;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.FileResourcePack;
-import net.minecraft.client.resources.IResourcePack;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-
 /**
  * Code Referenced and sourced from the EnderCore and CustomThings mods. All referenced sources and code belong to their original authors and is used with their permission. View the
  */
 
 public class CustomSoundsLoader {
 
-    private static List<IResourcePack> defaultResourcePacks;
+    //TODO keeping just in case
+    /*private static List<IResourcePack> defaultResourcePacks;
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private List<CustomFile> customsSounds = new ArrayList<CustomFile>();
     private File dir;
@@ -110,5 +91,5 @@ public class CustomSoundsLoader {
             this.ext = ext;
             this.file = file;
         }
-    }
+    }*/
 }

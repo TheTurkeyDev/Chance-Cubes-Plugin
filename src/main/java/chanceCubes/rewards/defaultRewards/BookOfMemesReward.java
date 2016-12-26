@@ -1,18 +1,20 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
-import chanceCubes.util.CCubesCommandSender;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.BookMeta.Generation;
 
 public class BookOfMemesReward implements IChanceCubeReward {
 
-    private List<String> memes = new ArrayList<String>();
+    private List<String> memes = new ArrayList<>();
     private Random random = new Random();
 
     public BookOfMemesReward() {
@@ -40,13 +42,13 @@ public class BookOfMemesReward implements IChanceCubeReward {
 
     @Override
     public void trigger(Location location, Player player) {
-        String meme = memes.get(random.nextInt(memes.size()));
-        MinecraftServer server = world.getMinecraftServer();
-        Boolean rule = server.worldServers[0].getGameRules().getBoolean("commandBlockOutput");
-        server.worldServers[0].getGameRules().setOrCreateGameRule("commandBlockOutput", "false");
-        String command = "/summon Item ~ ~1 ~ {Item:{id:written_book,Count:1,tag:{title:\"Book of Memes\",author:\"Chance Cubes\",generation:0,pages:[\"{text:\\\"" + meme + "\\\",color:black}\"]}}}";
-        CCubesCommandSender sender = new CCubesCommandSender(player, pos);
-        server.getCommandManager().executeCommand(sender, command);
-        server.worldServers[0].getGameRules().setOrCreateGameRule("commandBlockOutput", rule.toString());
+        ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+        BookMeta meta = (BookMeta) book.getItemMeta();
+        meta.setAuthor("Chance Cubes");
+        meta.setGeneration(Generation.ORIGINAL);
+        meta.setPages(Collections.singletonList(memes.get(random.nextInt(memes.size()))));
+        meta.setTitle("Book of Memes");
+        book.setItemMeta(meta);
+        location.getWorld().dropItem(location, book);
     }
 }

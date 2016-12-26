@@ -2,15 +2,12 @@ package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
 import chanceCubes.util.RewardsUtil;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.BlockStairs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
+import org.bukkit.material.Stairs;
+import org.bukkit.material.Step;
 
 public class TableFlipReward implements IChanceCubeReward {
 
@@ -24,71 +21,82 @@ public class TableFlipReward implements IChanceCubeReward {
         return CCubesCore.instance().getName().toLowerCase() + ":Table_Flip";
     }
 
-    public void nextStep(final int stage, final Location location, final BlockPos pos) {
-        Task task = new Task("Table_Flip", 10) {
-            @Override
-            public void callback() {
-                switch (stage) {
-                    case 0: {
-                        RewardsUtil.placeBlock(Blocks.WOODEN_SLAB.getDefaultState().withProperty(BlockSlab.HALF, BlockSlab.EnumBlockHalf.TOP), world, pos);
-                        RewardsUtil.placeBlock(Blocks.OAK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.WEST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.TOP).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT), world, pos.add(1, 0, 0));
-                        RewardsUtil.placeBlock(Blocks.OAK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.EAST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.TOP).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT), world, pos.add(-1, 0, 0));
-                        break;
-                    }
-                    case 1: {
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos);
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(1, 0, 0));
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(-1, 0, 0));
-
-                        RewardsUtil.placeBlock(Blocks.WOODEN_SLAB.getDefaultState().withProperty(BlockSlab.HALF, BlockSlab.EnumBlockHalf.TOP), world, pos.add(0, 1, 0));
-                        RewardsUtil.placeBlock(Blocks.OAK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.WEST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.TOP).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT), world, pos.add(1, 1, 0));
-                        RewardsUtil.placeBlock(Blocks.OAK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.EAST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.TOP).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT), world, pos.add(-1, 1, 0));
-                        break;
-                    }
-                    case 2: {
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(0, 1, 0));
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(1, 1, 0));
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(-1, 1, 0));
-
-                        RewardsUtil.placeBlock(Blocks.WOODEN_SLAB.getDefaultState().withProperty(BlockSlab.HALF, BlockSlab.EnumBlockHalf.TOP), world, pos.add(0, 2, 1));
-                        RewardsUtil.placeBlock(Blocks.OAK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.WEST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.TOP).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT), world, pos.add(1, 2, 1));
-                        RewardsUtil.placeBlock(Blocks.OAK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.EAST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.TOP).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT), world, pos.add(-1, 2, 1));
-                        break;
-                    }
-                    case 3: {
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(0, 2, 1));
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(1, 2, 1));
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(-1, 2, 1));
-
-                        RewardsUtil.placeBlock(Blocks.WOODEN_SLAB.getDefaultState().withProperty(BlockSlab.HALF, BlockSlab.EnumBlockHalf.BOTTOM), world, pos.add(0, 1, 2));
-                        RewardsUtil.placeBlock(Blocks.OAK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.WEST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT), world, pos.add(1, 1, 2));
-                        RewardsUtil.placeBlock(Blocks.OAK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.EAST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT), world, pos.add(-1, 1, 2));
-                        break;
-                    }
-                    case 4: {
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(0, 1, 2));
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(1, 1, 2));
-                        RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, pos.add(-1, 1, 2));
-
-                        RewardsUtil.placeBlock(Blocks.WOODEN_SLAB.getDefaultState().withProperty(BlockSlab.HALF, BlockSlab.EnumBlockHalf.BOTTOM), world, pos.add(0, 0, 2));
-                        RewardsUtil.placeBlock(Blocks.OAK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.WEST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT), world, pos.add(1, 0, 2));
-                        RewardsUtil.placeBlock(Blocks.OAK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.EAST).withProperty(BlockStairs.HALF, BlockStairs.EnumHalf.BOTTOM).withProperty(BlockStairs.SHAPE, BlockStairs.EnumShape.STRAIGHT), world, pos.add(-1, 0, 2));
-                        break;
-                    }
+    public void nextStep(final int stage, final Location location) {
+        RewardsUtil.scheduleTask(() -> {
+            Material woodStep = Material.WOOD_STEP;
+            Step step = new Step(woodStep);
+            Material woodStairs = Material.WOOD_STAIRS;
+            Stairs eastStairs = new Stairs(woodStairs);
+            eastStairs.setFacingDirection(BlockFace.EAST);
+            Stairs westStairs = new Stairs(woodStairs);
+            westStairs.setFacingDirection(BlockFace.WEST);
+            switch (stage) {
+                case 0: {
+                    step.setInverted(true);
+                    eastStairs.setInverted(true);
+                    westStairs.setInverted(true);
+                    RewardsUtil.placeBlock(woodStep, step, location);
+                    RewardsUtil.placeBlock(woodStairs, westStairs, location.clone().add(1, 0, 0));
+                    RewardsUtil.placeBlock(woodStairs, eastStairs, location.clone().add(-1, 0, 0));
+                    break;
                 }
+                case 1: {
+                    RewardsUtil.placeBlock(Material.AIR, location);
+                    RewardsUtil.placeBlock(Material.AIR, location.clone().add(1, 0, 0));
+                    RewardsUtil.placeBlock(Material.AIR, location.clone().add(-1, 0, 0));
 
-                if (stage < 4)
-                    nextStep(stage + 1, world, pos);
+                    step.setInverted(true);
+                    eastStairs.setInverted(true);
+                    westStairs.setInverted(true);
+                    RewardsUtil.placeBlock(woodStep, step, location.clone().add(0, 1, 0));
+                    RewardsUtil.placeBlock(woodStairs, westStairs, location.clone().add(1, 1, 0));
+                    RewardsUtil.placeBlock(woodStairs, eastStairs, location.clone().add(-1, 1, 0));
+                    break;
+                }
+                case 2: {
+                    RewardsUtil.placeBlock(Material.AIR, location.clone().add(0, 1, 0));
+                    RewardsUtil.placeBlock(Material.AIR, location.clone().add(1, 1, 0));
+                    RewardsUtil.placeBlock(Material.AIR, location.clone().add(-1, 1, 0));
+
+                    step.setInverted(true);
+                    eastStairs.setInverted(true);
+                    westStairs.setInverted(true);
+                    RewardsUtil.placeBlock(woodStep, step, location.clone().add(0, 2, 1));
+                    RewardsUtil.placeBlock(woodStairs, westStairs, location.clone().add(1, 2, 1));
+                    RewardsUtil.placeBlock(woodStairs, eastStairs, location.clone().add(-1, 2, 1));
+                    break;
+                }
+                case 3: {
+                    RewardsUtil.placeBlock(Material.AIR, location.clone().add(0, 2, 1));
+                    RewardsUtil.placeBlock(Material.AIR, location.clone().add(1, 2, 1));
+                    RewardsUtil.placeBlock(Material.AIR, location.clone().add(-1, 2, 1));
+                    
+                    RewardsUtil.placeBlock(woodStep, step, location.clone().add(0, 1, 2));
+                    RewardsUtil.placeBlock(woodStairs, westStairs, location.clone().add(1, 1, 2));
+                    RewardsUtil.placeBlock(woodStairs, eastStairs, location.clone().add(-1, 1, 2));
+                    break;
+                }
+                case 4: {
+                    RewardsUtil.placeBlock(Material.AIR, location.clone().add(0, 1, 2));
+                    RewardsUtil.placeBlock(Material.AIR, location.clone().add(1, 1, 2));
+                    RewardsUtil.placeBlock(Material.AIR, location.clone().add(-1, 1, 2));
+                    
+                    RewardsUtil.placeBlock(woodStep, step, location.clone().add(0, 0, 2));
+                    RewardsUtil.placeBlock(woodStairs, westStairs, location.clone().add(1, 0, 2));
+                    RewardsUtil.placeBlock(woodStairs, eastStairs, location.clone().add(-1, 0, 2));
+                    break;
+                }
             }
 
-        };
-
-        Scheduler.scheduleTask(task);
+            if (stage < 4)
+                nextStep(stage + 1, location);
+            
+        }, 10);
     }
 
     @Override
     public void trigger(Location location, Player player) {
-        RewardsUtil.sendMessageToAllPlayers(world, "(╯°□°）╯︵ ┻━┻)");
-        this.nextStep(0, world, pos);
+        RewardsUtil.sendMessageToAllPlayers(location.getWorld(), "(╯°□°）╯︵ ┻━┻)");
+        nextStep(0, location);
     }
 }

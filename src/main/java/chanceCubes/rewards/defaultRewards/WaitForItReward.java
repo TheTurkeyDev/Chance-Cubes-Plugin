@@ -1,16 +1,11 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
+import chanceCubes.util.RewardsUtil;
 import java.util.Random;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityTNTPrimed;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 public class WaitForItReward implements IChanceCubeReward {
@@ -29,33 +24,17 @@ public class WaitForItReward implements IChanceCubeReward {
 
     @Override
     public void trigger(final Location location, final Player player) {
-        player.addChatMessage(new TextComponentString("Wait for it......."));
-
-        Task task = new Task("Wait For It", rand.nextInt(4000) + 1000) {
-            @Override
-            public void callback() {
-                triggerRealReward();
-            }
-
-            private void triggerRealReward() {
-                int reward = rand.nextInt(3);
-                player.addChatMessage(new TextComponentString("NOW!"));
-
-                if (reward == 0) {
-                    world.spawnEntityInWorld(new EntityTNTPrimed(world, player.posX, player.posY, player.posZ, null));
-                }
-                else if (reward == 1) {
-                    Entity ent = new EntityCreeper(world);
-                    ent.setLocationAndAngles(player.posX, player.posY, player.posZ, 0, 0);
-                    world.spawnEntityInWorld(ent);
-                }
-                else if (reward == 2) {
-                    world.setBlockState(new BlockPos(player.posX, player.posY, player.posZ), Blocks.BEDROCK.getDefaultState());
-                }
-            }
-        };
-
-        Scheduler.scheduleTask(task);
+        player.sendMessage("Wait for it.......");
+        RewardsUtil.scheduleTask(() -> {
+            int reward = rand.nextInt(3);
+            player.sendMessage("NOW!");
+            if (reward == 0)
+                location.getWorld().spawnEntity(player.getLocation(), EntityType.PRIMED_TNT);
+            else if (reward == 1)
+                location.getWorld().spawnEntity(player.getLocation(), EntityType.CREEPER);
+            else if (reward == 2)
+                player.getLocation().getBlock().setType(Material.BEDROCK);
+        }, rand.nextInt(4000) + 1000);
     }
 
 }

@@ -1,16 +1,14 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
-import chanceCubes.util.CCubesAchievements;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemRenamer implements IChanceCubeReward {
 
@@ -35,22 +33,26 @@ public class ItemRenamer implements IChanceCubeReward {
         return CCubesCore.instance().getName().toLowerCase() + ":Item_Rename";
     }
 
+    //TODO need to test to see if this actually works
     @Override
     public void trigger(Location location, Player player) {
-        List<ItemStack> stacks = new ArrayList<ItemStack>();
-        for (ItemStack stack : player.inventory.mainInventory)
+        List<ItemStack> stacks = new ArrayList<>();
+        for (ItemStack stack : player.getInventory())
             if (stack != null)
                 stacks.add(stack);
 
-        for (ItemStack stack : player.inventory.armorInventory)
+        for (ItemStack stack : player.getInventory().getArmorContents())
             if (stack != null)
                 stacks.add(stack);
 
         if (stacks.size() == 0) {
-            ItemStack dirt = new ItemStack(Blocks.DIRT);
-            dirt.setStackDisplayName("A lonley piece of dirt");
-            player.inventory.addItemStackToInventory(dirt);
-            player.addStat(CCubesAchievements.lonelyDirt);
+            ItemStack dirt = new ItemStack(Material.DIRT);
+            ItemMeta meta = dirt.getItemMeta();
+            meta.setDisplayName("A lonely piece of dirt");
+            dirt.setItemMeta(meta);
+            player.getWorld().dropItem(player.getLocation(), dirt);
+            //TODO working on custom achievements
+            //player.addStat(CCubesAchievements.lonelyDirt);
             return;
         }
 
@@ -62,11 +64,15 @@ public class ItemRenamer implements IChanceCubeReward {
                 name += "'";
             else
                 name += "'s";
+
             String newName = name + " " + adj;
-            stacks.get(rand.nextInt(stacks.size())).setStackDisplayName(newName);
+            ItemStack itemStack = stacks.get(rand.nextInt(stacks.size()));
+            ItemMeta meta = itemStack.getItemMeta();
+            meta.setDisplayName(newName);
+            itemStack.setItemMeta(meta);
         }
 
-        player.addChatMessage(new TextComponentString("Those items of yours need a little personality!"));
+        player.sendMessage("Those items of yours need a little personality!");
 
     }
 }

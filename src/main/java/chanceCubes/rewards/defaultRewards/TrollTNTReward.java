@@ -11,6 +11,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.material.MaterialData;
 
 public class TrollTNTReward implements IChanceCubeReward {
 
@@ -33,7 +34,7 @@ public class TrollTNTReward implements IChanceCubeReward {
     public void trigger(Location location, final Player player) {
         for (int x = -1; x < 2; x++)
             for (int z = -1; z < 2; z++)
-                RewardsUtil.placeBlock(Material.WEB, location.clone().add(x, 0, z));
+                RewardsUtil.placeBlock(Material.WEB, new MaterialData(Material.WEB), location.clone().add(x, 0, z));
 
         TNTPrimed tnt = (TNTPrimed) location.getWorld().spawnEntity(location.clone().add(1, 1, 0), EntityType.PRIMED_TNT);
         player.playSound(player.getLocation(), Sound.ENTITY_TNT_PRIMED, 1F, 1F);

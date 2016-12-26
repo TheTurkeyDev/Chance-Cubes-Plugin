@@ -1,13 +1,12 @@
 package chanceCubes.rewards.type;
 
+import chanceCubes.CCubesCore;
 import chanceCubes.rewards.rewardparts.CommandPart;
-import chanceCubes.util.CCubesCommandSender;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import chanceCubes.util.RewardsUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class CommandRewardType extends BaseRewardType<CommandPart> {
 
@@ -16,29 +15,16 @@ public class CommandRewardType extends BaseRewardType<CommandPart> {
     }
 
     @Override
-    public void trigger(final CommandPart command, final World world, final int x, final int y, final int z, final EntityPlayer player) {
-        if (command.getDelay() != 0) {
-            Task task = new Task("Command Reward Delay", command.getDelay()) {
-                @Override
-                public void callback() {
-                    triggerCommand(command, world, x, y, z, player);
-                }
-            };
-            Scheduler.scheduleTask(task);
-        }
+    public void trigger(final CommandPart command, Location location, final Player player) {
+        if (command.getDelay() != 0)
+            RewardsUtil.scheduleTask(() -> triggerCommand(command, location, player), command.getDelay());
         else {
-            triggerCommand(command, world, x, y, z, player);
+            triggerCommand(command, location, player);
         }
     }
 
-    public void triggerCommand(CommandPart command, World world, int x, int y, int z, EntityPlayer player) {
-        String commandToRun = command.getParsedCommand(world, x, y, z, player);
-
-        CCubesCommandSender sender = new CCubesCommandSender(player, new BlockPos(x, y, z));
-        MinecraftServer server = world.getMinecraftServer();
-        Boolean rule = server.worldServers[0].getGameRules().getBoolean("commandBlockOutput");
-        server.worldServers[0].getGameRules().setOrCreateGameRule("commandBlockOutput", "false");
-        server.getCommandManager().executeCommand(sender, commandToRun);
-        server.worldServers[0].getGameRules().setOrCreateGameRule("commandBlockOutput", rule.toString());
+    public void triggerCommand(CommandPart command, Location location, Player player) {
+        String commandToRun = command.getParsedCommand(location, player);
+        Bukkit.dispatchCommand((CommandSender) CCubesCore.instance(), commandToRun);
     }
 }

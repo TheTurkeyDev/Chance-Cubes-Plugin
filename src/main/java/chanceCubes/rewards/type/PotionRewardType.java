@@ -1,17 +1,13 @@
 package chanceCubes.rewards.type;
 
 import chanceCubes.rewards.rewardparts.PotionPart;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
-import java.util.ArrayList;
-import java.util.List;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityPotion;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.potion.PotionUtils;
-import net.minecraft.world.World;
+import chanceCubes.util.RewardsUtil;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 
 public class PotionRewardType extends BaseRewardType<PotionPart> {
 
@@ -20,37 +16,18 @@ public class PotionRewardType extends BaseRewardType<PotionPart> {
     }
 
     @Override
-    public void trigger(final PotionPart part, final World world, final int x, final int y, final int z, final EntityPlayer player) {
-        if (part.getDelay() != 0) {
-            Task task = new Task("Potion Reward Delay", part.getDelay()) {
-                @Override
-                public void callback() {
-                    triggerPotion(part, world, x, y, z, player);
-                }
-            };
-            Scheduler.scheduleTask(task);
-        }
-        else {
-            triggerPotion(part, world, x, y, z, player);
-        }
+    public void trigger(final PotionPart part, Location location, final Player player) {
+        if (part.getDelay() != 0)
+            RewardsUtil.scheduleTask(() -> triggerPotion(part, player), part.getDelay());
+        else
+            triggerPotion(part, player);
     }
 
-    public void triggerPotion(PotionPart part, World world, int x, int y, int z, EntityPlayer player) {
-
-        ItemStack potion = new ItemStack(Items.SPLASH_POTION);
-
-        List<PotionEffect> effects = new ArrayList<PotionEffect>();
-        effects.add(part.getEffect());
-        PotionUtils.appendEffects(potion, effects);
-
-        EntityPotion entity = new EntityPotion(world, player, potion);
-        entity.posX = player.posX;
-        entity.posY = player.posY + 2;
-        entity.posZ = player.posZ;
-        entity.motionX = 0;
-        entity.motionY = 0.1;
-        entity.motionZ = 0;
-
-        world.spawnEntityInWorld(entity);
+    public void triggerPotion(PotionPart part, Player player) {
+        ItemStack potion = new ItemStack(Material.SPLASH_POTION);
+        PotionMeta potionMeta = (PotionMeta) potion.getItemMeta();
+        potionMeta.addCustomEffect(part.getEffect(), true);
+        Location playerLoc = player.getLocation();
+        playerLoc.getWorld().spawnEntity(playerLoc.clone().add(0, 2, 0), EntityType.SPLASH_POTION);
     }
 }

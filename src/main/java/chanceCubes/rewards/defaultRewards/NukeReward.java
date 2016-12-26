@@ -2,10 +2,10 @@ package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
 import chanceCubes.util.RewardsUtil;
-import net.minecraft.entity.item.EntityTNTPrimed;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 public class NukeReward implements IChanceCubeReward {
 
@@ -21,23 +21,27 @@ public class NukeReward implements IChanceCubeReward {
 
     @Override
     public void trigger(Location location, Player player) {
-        RewardsUtil.sendMessageToNearPlayers(world, pos, 32, "May death rain upon them");
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() - 6, pos.getY() + 65, pos.getZ() - 6, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() - 2, pos.getY() + 65, pos.getZ() - 6, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() + 2, pos.getY() + 65, pos.getZ() - 6, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() + 6, pos.getY() + 65, pos.getZ() - 6, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() - 6, pos.getY() + 65, pos.getZ() - 2, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() - 2, pos.getY() + 65, pos.getZ() - 2, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() + 2, pos.getY() + 65, pos.getZ() - 2, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() + 6, pos.getY() + 65, pos.getZ() - 2, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() - 6, pos.getY() + 65, pos.getZ() + 2, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() - 2, pos.getY() + 65, pos.getZ() + 2, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() + 2, pos.getY() + 65, pos.getZ() + 2, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() + 6, pos.getY() + 65, pos.getZ() + 2, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() - 6, pos.getY() + 65, pos.getZ() + 6, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() - 2, pos.getY() + 65, pos.getZ() + 6, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() + 2, pos.getY() + 65, pos.getZ() + 6, null));
-        world.spawnEntityInWorld(new EntityTNTPrimed(world, pos.getX() + 6, pos.getY() + 65, pos.getZ() + 6, null));
+        RewardsUtil.sendMessageToNearPlayers(location, 32, "May death rain upon them");
+        World world = location.getWorld();
+        int x = location.getBlockX();
+        int y = location.getBlockY();
+        int z = location.getBlockZ();
+        world.spawnEntity(new Location(world, x - 6, y + 65, z - 6), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x - 2, y + 65, z - 6), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x + 2, y + 65, z - 6), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x + 6, y + 65, z - 6), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x - 6, y + 65, z - 2), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x - 2, y + 65, z - 2), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x + 2, y + 65, z - 2), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x + 6, y + 65, z - 2), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x - 6, y + 65, z + 2), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x - 2, y + 65, z + 2), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x + 2, y + 65, z + 2), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x + 6, y + 65, z + 2), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x - 6, y + 65, z + 6), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x - 2, y + 65, z + 6), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x + 2, y + 65, z + 6), EntityType.PRIMED_TNT);
+        world.spawnEntity(new Location(world, x + 6, y + 65, z + 6), EntityType.PRIMED_TNT);
     }
 
 }

@@ -1,11 +1,11 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
+import chanceCubes.items.CCubesItems;
 import chanceCubes.util.RewardsUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 public class FiveProngReward implements IChanceCubeReward {
 
@@ -21,25 +21,25 @@ public class FiveProngReward implements IChanceCubeReward {
 
     @Override
     public void trigger(Location location, Player player) {
-        for (int xx = pos.getX() - 3; xx <= pos.getX() + 3; xx++)
-            for (int zz = pos.getZ() - 3; zz <= pos.getZ() + 3; zz++)
-                for (int yy = pos.getY(); yy <= pos.getY() + 4; yy++)
-                    RewardsUtil.placeBlock(Blocks.AIR.getDefaultState(), world, new BlockPos(xx, yy, zz));
+        for (int xx = location.getBlockX() - 3; xx <= location.getBlockX() + 3; xx++)
+            for (int zz = location.getBlockZ() - 3; zz <= location.getBlockZ() + 3; zz++)
+                for (int yy = location.getBlockY(); yy <= location.getBlockY() + 4; yy++)
+                    RewardsUtil.placeBlock(Material.AIR, new Location(location.getWorld(), xx, yy, zz));
 
-        RewardsUtil.placeBlock(Blocks.QUARTZ_BLOCK.getDefaultState(), world, pos);
-        RewardsUtil.placeBlock(Blocks.QUARTZ_BLOCK.getDefaultState(), world, pos.add(0, 1, 0));
-        RewardsUtil.placeBlock(CCubesBlocks.CHANCE_ICOSAHEDRON.getDefaultState(), world, pos.add(0, 2, 0));
+        RewardsUtil.placeBlock(Material.QUARTZ_BLOCK, location);
+        RewardsUtil.placeBlock(Material.QUARTZ_BLOCK, location.clone().add(0, 1, 0));
+        RewardsUtil.placeBlock(CCubesItems.chanceIcosahedron.getType(), location.clone().add(0, 2, 0));
 
-        RewardsUtil.placeBlock(Blocks.QUARTZ_BLOCK.getDefaultState(), world, pos.add(-3, 0, -3));
-        RewardsUtil.placeBlock(CCubesBlocks.CHANCE_CUBE.getDefaultState(), world, pos.add(-3, 1, -3));
+        RewardsUtil.placeBlock(Material.QUARTZ_BLOCK, location.clone().add(-3, 0, -3));
+        RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), location.clone().add(-3, 1, -3));
 
-        RewardsUtil.placeBlock(Blocks.QUARTZ_BLOCK.getDefaultState(), world, pos.add(-3, 0, 3));
-        RewardsUtil.placeBlock(CCubesBlocks.CHANCE_CUBE.getDefaultState(), world, pos.add(-3, 1, 3));
+        RewardsUtil.placeBlock(Material.QUARTZ_BLOCK, location.clone().add(-3, 0, 3));
+        RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), location.clone().add(-3, 1, 3));
 
-        RewardsUtil.placeBlock(Blocks.QUARTZ_BLOCK.getDefaultState(), world, pos.add(3, 0, -3));
-        RewardsUtil.placeBlock(CCubesBlocks.CHANCE_CUBE.getDefaultState(), world, pos.add(3, 1, -3));
+        RewardsUtil.placeBlock(Material.QUARTZ_BLOCK, location.clone().add(3, 0, -3));
+        RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), location.clone().add(3, 1, -3));
 
-        RewardsUtil.placeBlock(Blocks.QUARTZ_BLOCK.getDefaultState(), world, pos.add(3, 0, 3));
-        RewardsUtil.placeBlock(CCubesBlocks.CHANCE_CUBE.getDefaultState(), world, pos.add(3, 1, 3));
+        RewardsUtil.placeBlock(Material.QUARTZ_BLOCK, location.clone().add(3, 0, 3));
+        RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), location.clone().add(3, 1, 3));
     }
 }

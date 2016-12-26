@@ -1,8 +1,10 @@
 package chanceCubes.rewards.rewardparts;
 
+import chanceCubes.items.CCubesItems;
 import chanceCubes.util.RewardsUtil;
 import java.util.Random;
-import net.minecraft.item.ItemStack;
+import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
 
 public class ChestChanceItem {
 
@@ -32,15 +34,15 @@ public class ChestChanceItem {
     private ItemStack getItemStack(int amount, int meta) {
         ItemStack stack = RewardsUtil.getItemStack(mod, item, amount, meta);
         if (stack == null) {
-            stack = new ItemStack(RewardsUtil.getBlock(mod, item), amount, meta);
-            if (stack.getItem() == null)
-                stack = new ItemStack(CCubesBlocks.CHANCE_CUBE, 1, 0);
+            stack = CraftItemStack.asBukkitCopy(new net.minecraft.server.v1_10_R1.ItemStack(RewardsUtil.getBlock(mod, item), amount, meta));
+            if (stack.getType() == null)
+                stack = CCubesItems.chanceCube.clone();
         }
 
         return stack;
     }
 
     public ItemStack getRandomItemStack() {
-        return this.getItemStack(rand.nextInt(amountMax - amountMin) + amountMin, meta);
+        return getItemStack(rand.nextInt(amountMax - amountMin) + amountMin, meta);
     }
 }

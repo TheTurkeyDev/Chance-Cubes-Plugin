@@ -3,14 +3,16 @@ package chanceCubes.rewards.defaultRewards;
 import chanceCubes.CCubesCore;
 import chanceCubes.rewards.rewardparts.OffsetBlock;
 import chanceCubes.util.RewardsUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import org.bukkit.DyeColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.material.Wool;
+import org.bukkit.util.Vector;
 
 public class DoubleRainbow implements IChanceCubeReward {
 
-    byte[] colorsMeta = {14, 1, 4, 13, 11, 10};
+    DyeColor[] colors = {DyeColor.RED, DyeColor.ORANGE, DyeColor.YELLOW, DyeColor.GREEN, DyeColor.BLUE, DyeColor.PURPLE};
 
     @Override
     public int getChanceValue() {
@@ -24,30 +26,28 @@ public class DoubleRainbow implements IChanceCubeReward {
 
     @Override
     public void trigger(Location location, Player player) {
-        RewardsUtil.sendMessageToNearPlayers(world, pos, 32, "Double Rainbow!");
+        RewardsUtil.sendMessageToNearPlayers(location, 32, "Double Rainbow!");
         OffsetBlock b;
         for (int x = -7; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
-                float dist = (float) (Math.abs(pos.getDistance(pos.getX() + x, pos.getY() + y, pos.getZ())));
+                float dist = (float) (Math.abs(location.toVector().distance(new Vector(location.getX() + x, location.getY() + y, location.getZ()))));
                 if (dist > 1 && dist <= 8) {
                     int distIndex = (int) (dist - 2);
-                    b = new OffsetBlock(x, y, 0, Blocks.WOOL, false);
-                    b.setBlockState(Blocks.WOOL.getStateFromMeta(colorsMeta[distIndex]));
+                    b = new OffsetBlock(x, y, 0, Material.WOOL, new Wool(colors[distIndex]), false);
                     b.setDelay((x + 7) * 10);
-                    b.spawnInWorld(world, pos.getX(), pos.getY(), pos.getZ());
+                    b.spawnInWorld(location);
                 }
             }
         }
 
         for (int x = -17; x < 18; x++) {
             for (int y = 0; y < 18; y++) {
-                float dist = (float) (Math.abs(pos.getDistance(pos.getX() + x, pos.getY() + y, pos.getZ())));
+                float dist = (float) (Math.abs(location.toVector().distance(new Vector(location.getX() + x, location.getY() + y, location.getZ()))));
                 if (dist >= 12 && dist <= 18) {
                     int distIndex = (int) (dist - 12);
-                    b = new OffsetBlock(x, y, 0, Blocks.WOOL, false);
-                    b.setBlockState(Blocks.WOOL.getStateFromMeta(colorsMeta[distIndex]));
+                    b = new OffsetBlock(x, y, 0, Material.WOOL, new Wool(colors[distIndex]), false);
                     b.setDelay((x + 12) * 5);
-                    b.spawnInWorld(world, pos.getX(), pos.getY(), pos.getZ());
+                    b.spawnInWorld(location);
                 }
             }
         }

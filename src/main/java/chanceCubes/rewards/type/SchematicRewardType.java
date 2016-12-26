@@ -2,12 +2,11 @@ package chanceCubes.rewards.type;
 
 import chanceCubes.rewards.rewardparts.OffsetBlock;
 import chanceCubes.util.CustomSchematic;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
+import chanceCubes.util.RewardsUtil;
 import java.util.LinkedList;
 import java.util.Queue;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 public class SchematicRewardType implements IRewardType {
 
@@ -19,30 +18,28 @@ public class SchematicRewardType implements IRewardType {
         this.schematic = schematic;
     }
 
-    public void spawnInBlock(final Queue<OffsetBlock> stack, final CustomSchematic schem, final World world, final int x, final int y, final int z) {
-        Scheduler.scheduleTask(new Task("Schematic_Reward_Block_Spawn", schem.getdelay() < 1 ? 1 : (int) schem.getdelay()) {
-            @Override
-            public void callback() {
-                float lessThan1 = 0;
-                while (lessThan1 < 1 && !stack.isEmpty()) {
-                    OffsetBlock osb = stack.remove();
-                    osb.spawnInWorld(world, x, y, z);
-                    lessThan1 += schem.getdelay();
-                    if (stack.size() == 0)
-                        lessThan1 = 1;
-                }
-                if (stack.size() != 0)
-                    spawnInBlock(stack, schem, world, x, y, z);
+    public void spawnInBlock(final Queue<OffsetBlock> stack, final CustomSchematic schem, Location location) {
+        RewardsUtil.scheduleTask(() -> {
+            float lessThan1 = 0;
+            while (lessThan1 < 1 && !stack.isEmpty()) {
+                OffsetBlock osb = stack.remove();
+                osb.spawnInWorld(location);
+                lessThan1 += schem.getDelay();
+                if (stack.size() == 0)
+                    lessThan1 = 1;
             }
-        });
+
+            if (stack.size() != 0)
+                spawnInBlock(stack, schem, location);
+        }, schem.getDelay()< 1 ? 1 : (int) schem.getDelay());
     }
 
     @Override
-    public void trigger(World world, int x, int y, int z, EntityPlayer player) {
+    public void trigger(Location location, Player player) {
         for (OffsetBlock osb : schematic.getBlocks())
             stack.add(osb);
 
-        this.spawnInBlock(stack, schematic, world, x, y, z);
+        spawnInBlock(stack, schematic, location);
     }
 
 }

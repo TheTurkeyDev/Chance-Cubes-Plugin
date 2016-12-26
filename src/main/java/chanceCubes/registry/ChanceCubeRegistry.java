@@ -24,7 +24,7 @@ import chanceCubes.rewards.defaultRewards.IChanceCubeReward;
 import chanceCubes.rewards.defaultRewards.InventoryBombReward;
 import chanceCubes.rewards.defaultRewards.ItemOfDestinyReward;
 import chanceCubes.rewards.defaultRewards.ItemRenamer;
-import chanceCubes.rewards.defaultRewards.JukeBoxReward;
+import chanceCubes.rewards.defaultRewards.JukeboxReward;
 import chanceCubes.rewards.defaultRewards.MathReward;
 import chanceCubes.rewards.defaultRewards.MazeReward;
 import chanceCubes.rewards.defaultRewards.NukeReward;
@@ -311,7 +311,7 @@ public class ChanceCubeRegistry implements IRewardRegistry {
         INSTANCE.registerReward(new ThrownInAirReward());
         INSTANCE.registerReward(new DiscoReward());
         INSTANCE.registerReward(new InventoryBombReward());
-        INSTANCE.registerReward(new JukeBoxReward());
+        INSTANCE.registerReward(new JukeboxReward());
         INSTANCE.registerReward(new BookOfMemesReward());
         INSTANCE.registerReward(new RemoveUsefulThingsReward());
         INSTANCE.registerReward(new TableFlipReward());

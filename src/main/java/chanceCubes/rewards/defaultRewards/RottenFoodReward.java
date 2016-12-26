@@ -1,13 +1,11 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemFood;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 public class RottenFoodReward implements IChanceCubeReward {
 
@@ -23,14 +21,15 @@ public class RottenFoodReward implements IChanceCubeReward {
 
     @Override
     public void trigger(Location location, Player player) {
-        for (int i = 0; i < player.inventory.mainInventory.length; i++) {
-            ItemStack stack = player.inventory.mainInventory[i];
-            if (stack != null && stack.getItem() instanceof ItemFood)
-                player.inventory.mainInventory[i] = new ItemStack(Items.ROTTEN_FLESH, stack.stackSize);
+        PlayerInventory inv = player.getInventory();
+        for (int i = 0; i < inv.getSize(); i++) {
+            ItemStack stack = inv.getItem(i);
+            if (stack != null && stack.getType().isEdible()) {
+                stack.setType(Material.ROTTEN_FLESH);
+                inv.setItem(i, stack);
+            }
         }
 
-        player.addChatMessage(new TextComponentString("Ewwww it's all rotten"));
-
+        player.sendMessage("Ewwww it's all rotten");
     }
-
 }

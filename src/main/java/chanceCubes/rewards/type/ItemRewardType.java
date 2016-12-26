@@ -1,11 +1,11 @@
 package chanceCubes.rewards.type;
 
 import chanceCubes.rewards.rewardparts.ItemPart;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.World;
+import chanceCubes.util.RewardsUtil;
+import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 
 public class ItemRewardType extends BaseRewardType<ItemPart> {
 
@@ -13,25 +13,17 @@ public class ItemRewardType extends BaseRewardType<ItemPart> {
         super(items);
     }
 
-    public void spawnStack(ItemPart part, World world, int x, int y, int z, EntityPlayer player) {
-        EntityItem itemEnt = new EntityItem(world, x + 0.5, y + 0.5, z + 0.5, part.getItemStack().copy());
-        itemEnt.setPickupDelay(10);
-        world.spawnEntityInWorld(itemEnt);
+    public void spawnStack(ItemPart part, Location location) {
+        Item item = (Item) location.getWorld().spawnEntity(location.clone().add(0.5, 0.5, 0.5), EntityType.DROPPED_ITEM);
+        item.setItemStack(part.getItemStack());
+        part.setDelay(10);
     }
 
     @Override
-    public void trigger(final ItemPart part, final World world, final int x, final int y, final int z, final EntityPlayer player) {
-        if (part.getDelay() != 0) {
-            Task task = new Task("ItemStack Reward Delay", part.getDelay()) {
-                @Override
-                public void callback() {
-                    spawnStack(part, world, x, y, z, player);
-                }
-            };
-            Scheduler.scheduleTask(task);
-        }
-        else {
-            spawnStack(part, world, x, y, z, player);
-        }
+    public void trigger(final ItemPart part, Location location, final Player player) {
+        if (part.getDelay() != 0)
+            RewardsUtil.scheduleTask(() -> spawnStack(part, location), part.getDelay());
+        else
+            spawnStack(part, location);
     }
 }

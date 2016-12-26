@@ -2,13 +2,12 @@ package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
 import java.util.Random;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class InventoryBombReward implements IChanceCubeReward {
 
@@ -26,43 +25,43 @@ public class InventoryBombReward implements IChanceCubeReward {
 
     @Override
     public void trigger(Location location, Player player) {
-        for (ItemStack stack : player.inventory.mainInventory) {
+        for (ItemStack stack : player.getInventory()) {
             if (stack == null)
                 continue;
-            EntityItem ient = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), stack);
-            ient.motionY = rand.nextInt(1) - 0.5;
-            ient.setPickupDelay(40);
-            world.spawnEntityInWorld(ient);
+
+            Item item = location.getWorld().dropItemNaturally(location, stack);
+            item.setPickupDelay(40);
         }
-        for (ItemStack stack : player.inventory.armorInventory) {
+
+        for (ItemStack stack : player.getInventory().getArmorContents()) {
             if (stack == null)
                 continue;
-            EntityItem ient = new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), stack);
-            ient.motionY = rand.nextInt(1) - 0.5;
-            ient.setPickupDelay(40);
-            world.spawnEntityInWorld(ient);
+
+            Item item = location.getWorld().dropItemNaturally(location, stack);
+            item.setPickupDelay(40);
         }
 
-        for (int i = 0; i < player.inventory.mainInventory.length; i++)
-            player.inventory.mainInventory[i] = new ItemStack(Blocks.DEADBUSH, 64);
+        while (player.getInventory().firstEmpty() > -1)
+            player.getInventory().addItem(new ItemStack(Material.DEAD_BUSH, 64));
 
-        for (int i = 0; i < player.inventory.armorInventory.length; i++) {
-            ItemStack stack = new ItemStack(Blocks.DEADBUSH, 64);
+        ItemStack[] armor = new ItemStack[4];
+        for (int i = 0; i < player.getInventory().getArmorContents().length; i++) {
+            ItemStack stack = new ItemStack(Material.DEAD_BUSH, 64);
+            ItemMeta meta = stack.getItemMeta();
             if (i == 0) {
-                stack.setStackDisplayName("ButtonBoy");
-                stack.stackSize = 13;
+                meta.setDisplayName("ButtonBoy");
+                stack.setAmount(13);
             }
             else if (i == 1) {
-                stack.setStackDisplayName("TheBlackswordsman");
-                stack.stackSize = 13;
+                meta.setDisplayName("TheBlackSwordsman");
+                stack.setAmount(13);
             }
-            player.inventory.armorInventory[i] = stack;
+
+            stack.setItemMeta(meta);
+            armor[i] = stack;
         }
 
-        player.inventory.clear();
-
-        player.addChatMessage(new TextComponentString("Inventory Bomb!!!!"));
-
+        player.getInventory().setArmorContents(armor);
+        player.sendMessage("Inventory Bomb!!!!");
     }
-
 }

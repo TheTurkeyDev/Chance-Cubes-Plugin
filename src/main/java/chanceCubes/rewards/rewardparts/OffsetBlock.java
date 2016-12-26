@@ -30,11 +30,15 @@ public class OffsetBlock {
     protected boolean falling;
     protected boolean relativeToPlayer = false;
 
-    public OffsetBlock(int x, int y, int z, Material m, MaterialData materialData, boolean falling) {
-        this(x, y, z, m, falling, materialData, 0);
+    public OffsetBlock(int x, int y, int z, Material m, boolean falling) {
+        this(x, y, z, m, new MaterialData(m), falling);
     }
 
-    public OffsetBlock(int x, int y, int z, Material m, boolean falling, MaterialData materialData, int delay) {
+    public OffsetBlock(int x, int y, int z, Material m, MaterialData materialData, boolean falling) {
+        this(x, y, z, m, materialData, falling, 0);
+    }
+
+    public OffsetBlock(int x, int y, int z, Material m, MaterialData materialData, boolean falling, int delay) {
         this.xOff = x;
         this.yOff = y;
         this.zOff = z;

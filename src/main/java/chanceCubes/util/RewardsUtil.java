@@ -16,6 +16,7 @@ import net.minecraft.server.v1_10_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -82,7 +83,7 @@ public class RewardsUtil {
         for (int y = 0; y < ySize; y++)
             for (int z = 0; z < zSize; z++)
                 for (int x = 0; x < xSize; x++)
-                    toReturn.add(new OffsetBlock(x + xOff, y + yOff, z + zOff, block.getType(), falling, block.getState().getData(), delay).setCausesBlockUpdate(causesUpdate).setRelativeToPlayer(relativeToPlayer));
+                    toReturn.add(new OffsetBlock(x + xOff, y + yOff, z + zOff, block.getType(), block.getState().getData(), falling, delay).setCausesBlockUpdate(causesUpdate).setRelativeToPlayer(relativeToPlayer));
 
         return toReturn.toArray(new OffsetBlock[toReturn.size()]);
     }
@@ -184,6 +185,11 @@ public class RewardsUtil {
         return isUnbreakable;
     }
 
+    //TODO need to create a method that id's blocks as chance blocks
+    public static boolean placeBlock(Material material, Location location) {
+        return placeBlock(material, new MaterialData(material), location);
+    }
+
     public static boolean placeBlock(Material material, MaterialData data, Location location) {
         if (!material.isBlock())
             return false;
@@ -214,7 +220,7 @@ public class RewardsUtil {
         return toReturn;
     }
 
-    public static ParticlePart[] spawnXParticles(int particle, int amount) {
+    public static ParticlePart[] spawnXParticles(Particle particle, int amount) {
         ParticlePart[] toReturn = new ParticlePart[amount];
         for (int i = 0; i < amount; i++)
             toReturn[i] = new ParticlePart(particle);

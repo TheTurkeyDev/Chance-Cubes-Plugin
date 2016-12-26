@@ -1,7 +1,6 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
-import chanceCubes.util.CCubesCommandSender;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

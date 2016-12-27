@@ -3,14 +3,12 @@ package chanceCubes.rewards.giantRewards;
 import chanceCubes.CCubesCore;
 import chanceCubes.rewards.defaultRewards.IChanceCubeReward;
 import chanceCubes.rewards.rewardparts.OffsetBlock;
-import chanceCubes.util.CustomEntry;
 import chanceCubes.util.RewardsUtil;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 public class OreSphereReward implements IChanceCubeReward {
 
@@ -21,26 +19,23 @@ public class OreSphereReward implements IChanceCubeReward {
 
     @Override
     public String getName() {
-        return CCubesCore.MODID + ":Ore_Sphere";
+        return CCubesCore.instance().getName().toLowerCase() + ":Ore_Sphere";
     }
 
     @Override
-    public void trigger(World world, BlockPos pos, EntityPlayer player) {
-        List<OffsetBlock> blocks = new ArrayList<OffsetBlock>();
+    public void trigger(Location location, Player player) {
+        List<OffsetBlock> blocks = new ArrayList<>();
 
-        CustomEntry<Block, Integer> ore = RewardsUtil.getRandomOre();
-
+        Material ore = RewardsUtil.getRandomOre();
         int delay = 0;
         for (int i = 0; i < 5; i++) {
             for (int yy = -5; yy < 6; yy++) {
                 for (int zz = -5; zz < 6; zz++) {
                     for (int xx = -5; xx < 6; xx++) {
-                        BlockPos loc = new BlockPos(xx, yy, zz);
-                        double dist = Math.abs(loc.getDistance(0, 0, 0));
+                        Location loc = new Location(location.getWorld(), xx, yy, zz);
+                        double dist = Math.abs(loc.distance(new Location(loc.getWorld(), 0, 0, 0)));
                         if (dist <= i && dist > i - 1) {
-                            OffsetBlock osb = new OffsetBlock(xx, yy, zz, ore.getKey(), false, delay);
-                            osb.setBlockState(ore.getKey().getStateFromMeta(ore.getValue()));
-                            blocks.add(osb);
+                            blocks.add(new OffsetBlock(xx, yy, zz, ore, false, delay));
                             delay++;
                         }
                     }
@@ -50,7 +45,6 @@ public class OreSphereReward implements IChanceCubeReward {
         }
 
         for (OffsetBlock b : blocks)
-            b.spawnInWorld(world, pos.getX(), pos.getY(), pos.getZ());
+            b.spawnInWorld(location);
     }
-
 }

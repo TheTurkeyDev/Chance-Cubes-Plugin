@@ -10,44 +10,43 @@ import chanceCubes.rewards.biodomeGen.OceanBiome;
 import chanceCubes.rewards.biodomeGen.SnowGlobeBiome;
 import chanceCubes.rewards.defaultRewards.IChanceCubeReward;
 import chanceCubes.rewards.rewardparts.OffsetBlock;
+import chanceCubes.util.RewardsUtil;
 import chanceCubes.util.Scheduler;
 import chanceCubes.util.Task;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 public class BioDomeReward implements IChanceCubeReward {
 
     public static final int delayShorten = 10;
-    // @formatter:off
     private IBioDomeBiome[] biomes = new IBioDomeBiome[]{new BasicTreesBiome(), new DesertBiome(),
             new EndBiome(), new OceanBiome(), new SnowGlobeBiome(), new NetherBiome()};
-    // @formatter:on
     private Random rand = new Random();
 
-    public void genDome(final BlockPos pos, final World world, final IBioDomeBiome spawnedBiome) {
-        this.genDomePart(0, -25, pos, world, spawnedBiome);
+    public void genDome(final Location location, final IBioDomeBiome spawnedBiome) {
+        genDomePart(0, -25, location, spawnedBiome);
     }
 
-    public void genDomePart(final int yinc, final int xinc, final BlockPos pos, final World world, final IBioDomeBiome spawnedBiome) {
-        List<OffsetBlock> blocks = new ArrayList<OffsetBlock>();
+    public void genDomePart(final int yinc, final int xinc, final Location location, final IBioDomeBiome spawnedBiome) {
+        List<OffsetBlock> blocks = new ArrayList<>();
         int delay = 0;
         for (int z = -25; z <= 25; z++) {
-            BlockPos loc = new BlockPos(xinc, yinc, z);
-            float dist = (float) (Math.abs(loc.getDistance(0, 0, 0)) - 25);
+            Location loc = new Location(location.getWorld(), xinc, yinc, z);
+            float dist = (float) (Math.abs(loc.distance(new Location(location.getWorld(), 0, 0, 0)) - 25));
             if (dist < 1) {
                 if (dist >= 0) {
-                    blocks.add(new OffsetBlock(xinc, yinc, z, Blocks.GLASS, false, (delay / delayShorten)));
+                    blocks.add(new OffsetBlock(xinc, yinc, z, Material.GLASS, false, (delay / delayShorten)));
                     delay++;
                 }
                 else if (yinc == 0) {
                     blocks.add(new OffsetBlock(xinc, yinc, z, spawnedBiome.getFloorBlock(), false, (delay / delayShorten)));
                     delay++;
                 }
+
                 spawnedBiome.getRandomGenBlock(dist, rand, xinc, yinc, z, blocks, delay);
             }
         }
@@ -62,7 +61,7 @@ public class BioDomeReward implements IChanceCubeReward {
             Scheduler.scheduleTask(new Task("Entity_Delays", delay) {
                 @Override
                 public void callback() {
-                    spawnedBiome.spawnEntities(pos, world);
+                    spawnedBiome.spawnEntities(location);
                 }
             });
             return;
@@ -71,13 +70,14 @@ public class BioDomeReward implements IChanceCubeReward {
         final int nextYinc = Yinctemp;
 
         for (OffsetBlock b : blocks)
-            b.spawnInWorld(world, pos.getX(), pos.getY(), pos.getZ());
+            b.spawnInWorld(location);
 
+        RewardsUtil.scheduleTask(() -> genDomePart(nextYinc, nextXinc, location, spawnedBiome), delay / delayShorten);
         Task task = new Task("BioDome Reward", (delay / delayShorten)) {
 
             @Override
             public void callback() {
-                genDomePart(nextYinc, nextXinc, pos, world, spawnedBiome);
+                genDomePart(nextYinc, nextXinc, location, spawnedBiome);
             }
 
         };
@@ -92,15 +92,15 @@ public class BioDomeReward implements IChanceCubeReward {
 
     @Override
     public String getName() {
-        return CCubesCore.MODID + ":BioDome";
+        return CCubesCore.instance().getName().toLowerCase() + ":BioDome";
     }
 
     @Override
-    public void trigger(final World world, final BlockPos pos, EntityPlayer player) {
+    public void trigger(final Location location, Player player) {
         // player.addChatMessage(new ChatComponentText("Hey! I can be a Pandora's Box to!"));
 
         final IBioDomeBiome spawnedBiome = biomes[rand.nextInt(biomes.length)];
-        this.genDome(pos, world, spawnedBiome);
+        genDome(location, spawnedBiome);
     }
 
 }

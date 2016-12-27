@@ -2,18 +2,17 @@ package chanceCubes.rewards.giantRewards;
 
 import chanceCubes.CCubesCore;
 import chanceCubes.rewards.defaultRewards.IChanceCubeReward;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
+import chanceCubes.util.RewardsUtil;
 import java.util.Random;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityTNTPrimed;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityEgg;
-import net.minecraft.entity.projectile.EntityLargeFireball;
-import net.minecraft.entity.projectile.EntityTippedArrow;
-import net.minecraft.entity.projectile.EntityWitherSkull;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.server.v1_10_R1.EntityLargeFireball;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftLargeFireball;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.util.Vector;
 
 public class ThrowablesReward implements IChanceCubeReward {
 
@@ -26,53 +25,41 @@ public class ThrowablesReward implements IChanceCubeReward {
 
     @Override
     public String getName() {
-        return CCubesCore.MODID + ":Trowables";
+        return CCubesCore.instance().getName().toLowerCase() + ":Throwables";
     }
 
-    public void throwThing(final int count, final World world, final BlockPos pos) {
+    public void throwThing(final int count, final Location location) {
+        World world = location.getWorld();
         int entChoice = random.nextInt(5);
-        Entity throwEnt;
-        if (entChoice == 0) {
-            throwEnt = new EntityTippedArrow(world);
-        }
+        if (entChoice == 0)
+            world.spawnArrow(location, new Vector(-1 + (Math.random() * 2), -1 + (Math.random() * 2), -1 + (Math.random() * 2)), 0.6f, 12f);
         else if (entChoice == 1) {
-            throwEnt = new EntityLargeFireball(world);
-            ((EntityLargeFireball) throwEnt).accelerationX = 0.1f * (-1 + (Math.random() * 2));
-            ((EntityLargeFireball) throwEnt).accelerationY = 0.1f * (-1 + (Math.random() * 2));
-            ((EntityLargeFireball) throwEnt).accelerationZ = 0.1f * (-1 + (Math.random() * 2));
+            EntityLargeFireball nmsFireball = setEntityMotion((CraftLargeFireball) world.spawnEntity(location, EntityType.FIREBALL)).getHandle();
+            nmsFireball.dirX = 0.1f * (-1 + (Math.random() * 2));
+            nmsFireball.dirY = 0.1f * (-1 + (Math.random() * 2));
+            nmsFireball.dirZ = 0.1f * (-1 + (Math.random() * 2));
         }
-        else if (entChoice == 2) {
-            throwEnt = new EntityEgg(world);
-        }
-        else if (entChoice == 3) {
-            throwEnt = new EntityWitherSkull(world);
-        }
+        else if (entChoice == 2)
+            setEntityMotion(world.spawnEntity(location, EntityType.EGG));
+        else if (entChoice == 3)
+            setEntityMotion(world.spawnEntity(location, EntityType.WITHER_SKULL));
         else {
-            throwEnt = new EntityTNTPrimed(world);
-            ((EntityTNTPrimed) throwEnt).setFuse(20);
+            TNTPrimed tnt = setEntityMotion((TNTPrimed) world.spawnEntity(location, EntityType.PRIMED_TNT));
+            tnt.setFuseTicks(20);
         }
-        throwEnt.setLocationAndAngles(pos.getX(), pos.getY(), pos.getZ(), 0, 0);
-        throwEnt.motionX = -1 + (Math.random() * 2);
-        throwEnt.motionY = -1 + (Math.random() * 2);
-        throwEnt.motionZ = -1 + (Math.random() * 2);
-        world.spawnEntityInWorld(throwEnt);
 
-        if (count < 50) {
-            Task task = new Task("Throw TNT", 5) {
+        if (count < 50)
+            RewardsUtil.scheduleTask(() -> throwThing(count + 1, location), 5);
+    }
 
-                @Override
-                public void callback() {
-                    throwThing(count + 1, world, pos);
-                }
-
-            };
-            Scheduler.scheduleTask(task);
-        }
+    private <E extends Entity> E setEntityMotion(E entity) {
+        entity.setVelocity(new Vector(-1 + (Math.random() * 2), -1 + (Math.random() * 2), -1 + (Math.random() * 2)));
+        return entity;
     }
 
     @Override
-    public void trigger(World world, BlockPos pos, EntityPlayer player) {
-        this.throwThing(0, world, pos);
+    public void trigger(Location location, Player player) {
+        throwThing(0, location);
     }
 
 }

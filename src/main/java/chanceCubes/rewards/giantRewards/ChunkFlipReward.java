@@ -2,15 +2,13 @@ package chanceCubes.rewards.giantRewards;
 
 import chanceCubes.CCubesCore;
 import chanceCubes.rewards.defaultRewards.IChanceCubeReward;
-import chanceCubes.sounds.CCubesSounds;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import chanceCubes.util.RewardsUtil;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Player;
+import org.bukkit.material.MaterialData;
 
 public class ChunkFlipReward implements IChanceCubeReward {
 
@@ -25,44 +23,47 @@ public class ChunkFlipReward implements IChanceCubeReward {
 
     @Override
     public String getName() {
-        return CCubesCore.MODID + ":Chunk_Flip";
+        return CCubesCore.instance().getName().toLowerCase() + ":Chunk_Flip";
     }
 
-    public void moveLayer(final World world, final int x, int y, final int z, final EntityPlayer player) {
-        if (y >= world.getActualHeight() / 2)
+    public void moveLayer(final World world, final int x, int y, final int z) {
+        if (y >= world.getMaxHeight() / 2)
             return;
+
         for (int zz = 0; zz < 16; zz++) {
             for (int xx = 0; xx < 16; xx++) {
-                BlockPos pos1 = new BlockPos(x + xx, y, z + zz);
-                BlockPos pos2 = new BlockPos(x + xx, world.getActualHeight() - y, z + zz);
-                IBlockState b = world.getBlockState(pos1);
-                IBlockState b2 = world.getBlockState(pos2);
-                if (!b.getBlock().equals(Blocks.GRAVEL) && !b.getBlock().equals(CCubesBlocks.GIANT_CUBE)) {
-                    world.setBlockState(pos1, b2, 2);
-                    world.setBlockState(pos2, b, 2);
+                Location pos1 = new Location(world, x + xx, y, z + zz);
+                Location pos2 = new Location(world, x + xx, world.getMaxHeight() - y, z + zz);
+                BlockState b = pos1.getBlock().getState();
+                BlockState b2 = pos2.getBlock().getState();
+                if (b.getBlock().getType() != Material.GRAVEL && b.getMetadata("ChanceCubes").size() > 0) {
+                    Material material2 = b.getType();
+                    MaterialData materialData1 = b.getData();
+                    Material material1 = b2.getType();
+                    MaterialData materialData2 = b2.getData();
+                    b.setType(material2);
+                    b.setData(materialData2);
+                    b.update(true);
+                    b2.setType(material1);
+                    b2.setData(materialData1);
+                    b2.update(true);
                 }
             }
         }
 
-        final int nextY = y + 1;
-        Task task = new Task("Chunk_Flip_Delay", 10) {
-            public void callback() {
-                moveLayer(world, x, nextY, z, player);
-            }
-        };
-
-        Scheduler.scheduleTask(task);
+        RewardsUtil.scheduleTask(() -> moveLayer(world, x, y + 1, z), 10);
     }
 
     @Override
-    public void trigger(World world, BlockPos pos, EntityPlayer player) {
-        int zBase = pos.getZ() - (pos.getZ() % 16);
-        int xBase = pos.getX() - (pos.getX() % 16);
+    public void trigger(Location location, Player player) {
+        int zBase = location.getBlockZ() - (location.getBlockZ() % 16);
+        int xBase = location.getBlockX() - (location.getBlockX() % 16);
 
-        moveLayer(world, xBase, 0, zBase, player);
+        moveLayer(location.getWorld(), xBase, 0, zBase);
 
-        world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), CCubesSounds.GIANT_CUBE_SPAWN.getSoundEvent(), CCubesSounds.GIANT_CUBE_SPAWN.getSoundCategory(), 1.0F, 1.0F);
-        player.addChatMessage(new TextComponentString("Inception!!!!"));
+        //TODO revisit this when working on custom sounds
+        //world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), CCubesSounds.GIANT_CUBE_SPAWN.getSoundEvent(), CCubesSounds.GIANT_CUBE_SPAWN.getSoundCategory(), 1.0F, 1.0F);
+        player.sendMessage("Inception!!!!");
     }
 
 }

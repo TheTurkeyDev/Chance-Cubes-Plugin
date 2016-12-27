@@ -5,7 +5,6 @@ import chanceCubes.rewards.rewardparts.CommandPart;
 import chanceCubes.rewards.rewardparts.EntityPart;
 import chanceCubes.rewards.rewardparts.OffsetBlock;
 import chanceCubes.rewards.rewardparts.ParticlePart;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -117,29 +116,21 @@ public class RewardsUtil {
         return b;
     }
 
-    //TODO No FluidRegistry in Vanilla
-    /*public static Fluid getRandomFluid() {
-        Fluid f = FluidRegistry.getFluid(RewardsUtil.getFluids().get(rand.nextInt(RewardsUtil.getFluids().size())));
-        while (f == null || f.getBlock() == null)
-            f = FluidRegistry.getFluid(RewardsUtil.getFluids().get(rand.nextInt(RewardsUtil.getFluids().size())));
-
-        return f;
-    }*/
+    public static Material getRandomFluid() {
+        return Arrays.asList(Material.STATIONARY_LAVA, Material.STATIONARY_WATER).get(rand.nextInt(2));
+    }
 
     public static Material getRandomItem() {
-        Material material = Material.getMaterial(256 + rand.nextInt(166));
+        Material material = Material.values()[256 + rand.nextInt(166)];
         while (material == null)
-            material = Material.getMaterial(256 + rand.nextInt(166));
+            material = Material.values()[256 + rand.nextInt(166)];
 
         return material;
     }
 
-    public static SimpleEntry<net.minecraft.server.v1_10_R1.Block, Integer> getRandomOre() {
+    public static Material getRandomOre() {
         List<Material> ores = Arrays.asList(Material.COAL_ORE, Material.DIAMOND_ORE, Material.EMERALD_ORE, Material.GOLD_ORE, Material.IRON_ORE, Material.LAPIS_ORE, Material.QUARTZ_ORE, Material.REDSTONE_ORE);
-        ItemStack itemStack = new ItemStack(ores.get(rand.nextInt(ores.size())));
-        net.minecraft.server.v1_10_R1.Block ore = net.minecraft.server.v1_10_R1.Block.asBlock(CraftItemStack.asNMSCopy(itemStack).getItem());
-        int meta = itemStack.getDurability();
-        return new SimpleEntry<>(ore, meta);
+        return ores.get(rand.nextInt(ores.size()));
     }
 
     //TODO OreDictionary and Fluid Registry not a thing in Vanilla

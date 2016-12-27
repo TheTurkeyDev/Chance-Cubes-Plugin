@@ -5,12 +5,9 @@ import chanceCubes.rewards.defaultRewards.IChanceCubeReward;
 import chanceCubes.rewards.rewardparts.OffsetBlock;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 public class FloorIsLavaReward implements IChanceCubeReward {
 
@@ -21,24 +18,24 @@ public class FloorIsLavaReward implements IChanceCubeReward {
 
     @Override
     public String getName() {
-        return CCubesCore.MODID + ":Floor_Is_Lava";
+        return CCubesCore.instance().getName().toLowerCase() + ":Floor_Is_Lava";
     }
 
     @Override
-    public void trigger(World world, BlockPos pos, EntityPlayer player) {
-        player.addChatMessage(new TextComponentString("Quick! The Floor is lava!"));
-        List<OffsetBlock> blocks = new ArrayList<OffsetBlock>();
+    public void trigger(Location location, Player player) {
+        player.sendMessage("Quick! The Floor is lava!");
+        List<OffsetBlock> blocks = new ArrayList<>();
         int delay = 0;
-        for (int yy = pos.getY() + 5; yy > pos.getY() - 5; yy--) {
+        for (int yy = location.getBlockY() + 5; yy > location.getBlockY() - 5; yy--) {
             int xx = 0, zz = 0, dx = 0, dy = -1;
             int t = 32;
             int maxI = t * t;
 
             for (int i = 0; i < maxI; i++) {
                 if ((-16 / 2 <= xx) && (xx <= 16 / 2) && (-16 / 2 <= zz) && (zz <= 16 / 2)) {
-                    Block blockAt = world.getBlockState(new BlockPos(pos.getX() + xx, yy, pos.getY() + zz)).getBlock();
-                    if (!blockAt.equals(Blocks.AIR)) {
-                        blocks.add(new OffsetBlock(xx, yy - pos.getY(), zz, Blocks.LAVA, false, delay));
+                    Material blockAt = new Location(location.getWorld(), location.getX() + xx, yy, location.getZ() + zz).getBlock().getType();
+                    if (blockAt != Material.AIR) {
+                        blocks.add(new OffsetBlock(xx, yy - location.getBlockY(), zz, Material.STATIONARY_LAVA, false, delay));
                         delay++;
                     }
                 }
@@ -48,13 +45,14 @@ public class FloorIsLavaReward implements IChanceCubeReward {
                     dx = -dy;
                     dy = t;
                 }
+
                 xx += dx;
                 zz += dy;
             }
         }
 
         for (OffsetBlock b : blocks)
-            b.spawnInWorld(world, pos.getX(), pos.getY(), pos.getZ());
+            b.spawnInWorld(location);
     }
 
 }

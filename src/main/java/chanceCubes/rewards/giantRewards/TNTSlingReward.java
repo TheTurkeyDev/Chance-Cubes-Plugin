@@ -2,12 +2,12 @@ package chanceCubes.rewards.giantRewards;
 
 import chanceCubes.CCubesCore;
 import chanceCubes.rewards.defaultRewards.IChanceCubeReward;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
-import net.minecraft.entity.item.EntityTNTPrimed;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import chanceCubes.util.RewardsUtil;
+import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.util.Vector;
 
 public class TNTSlingReward implements IChanceCubeReward {
 
@@ -18,45 +18,29 @@ public class TNTSlingReward implements IChanceCubeReward {
 
     @Override
     public String getName() {
-        return CCubesCore.MODID + ":TNT_Throw";
+        return CCubesCore.instance().getName().toLowerCase() + ":TNT_Throw";
     }
 
-    public void throwTNT(final int count, final World world, final BlockPos pos, final EntityPlayer player) {
-        EntityTNTPrimed tnt = new EntityTNTPrimed(world, pos.getX(), pos.getY() + 1D, pos.getZ(), player);
-        world.spawnEntityInWorld(tnt);
-        tnt.setFuse(60);
-        tnt.motionX = -1 + (Math.random() * 2);
-        tnt.motionY = Math.random();
-        tnt.motionZ = -1 + (Math.random() * 2);
+    public void throwTNT(final int count, final Location location) {
+        TNTPrimed tnt = (TNTPrimed) location.getWorld().spawnEntity(location.clone().add(0, 1, 0), EntityType.PRIMED_TNT);
+        tnt.setFuseTicks(60);
+        tnt.setVelocity(new Vector(-1 + (Math.random() * 2), Math.random(), -1 + (Math.random() * 2)));
 
-        if (count < 25) {
-            Task task = new Task("Throw TNT", 10) {
-
-                @Override
-                public void callback() {
-                    throwTNT(count + 1, world, pos, player);
-                }
-
-            };
-            Scheduler.scheduleTask(task);
-        }
+        if (count < 25)
+            RewardsUtil.scheduleTask(() -> throwTNT(count + 1, location), 10);
         else {
             for (double xx = 1; xx > -1; xx -= 0.25) {
                 for (double zz = 1; zz > -1; zz -= 0.25) {
-                    tnt = new EntityTNTPrimed(world, pos.getX(), pos.getY() + 1D, pos.getZ(), null);
-                    world.spawnEntityInWorld(tnt);
-                    tnt.setFuse(60);
-                    tnt.motionX = xx;
-                    tnt.motionY = Math.random();
-                    tnt.motionZ = zz;
+                    tnt = (TNTPrimed) location.getWorld().spawnEntity(location.clone().add(0, 1, 0), EntityType.PRIMED_TNT);
+                    tnt.setFuseTicks(60);
+                    tnt.setVelocity(new Vector(xx, Math.random(), zz));
                 }
             }
         }
     }
 
     @Override
-    public void trigger(World world, BlockPos pos, EntityPlayer player) {
-        this.throwTNT(0, world, pos, player);
+    public void trigger(Location location, Player player) {
+        throwTNT(0, location);
     }
-
 }

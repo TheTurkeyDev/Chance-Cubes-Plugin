@@ -3,37 +3,34 @@ package chanceCubes.rewards.giantRewards;
 import chanceCubes.CCubesCore;
 import chanceCubes.rewards.defaultRewards.IChanceCubeReward;
 import chanceCubes.rewards.rewardparts.OffsetBlock;
-import chanceCubes.util.CustomEntry;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 public class ChunkReverserReward implements IChanceCubeReward {
 
-    private List<Entry<Block, Block>> swappedMap = new ArrayList<Entry<Block, Block>>();
+    private List<Entry<Material, Material>> swappedMap = new ArrayList<>();
 
     public ChunkReverserReward() {
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.STONE, Blocks.DIRT));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.DIRT, Blocks.COBBLESTONE));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.GRASS, Blocks.STONE));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.GRAVEL, Blocks.SAND));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.SAND, Blocks.GRAVEL));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.IRON_ORE, Blocks.GOLD_ORE));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.COAL_ORE, Blocks.DIAMOND_ORE));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.DIAMOND_ORE, Blocks.COAL_ORE));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.GOLD_ORE, Blocks.IRON_ORE));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.LAVA, Blocks.WATER));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.WATER, Blocks.LAVA));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.LOG, Blocks.LEAVES));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.LOG2, Blocks.LEAVES2));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.LEAVES, Blocks.LOG));
-        swappedMap.add(new CustomEntry<Block, Block>(Blocks.LEAVES2, Blocks.LOG2));
+        swappedMap.add(new SimpleEntry<>(Material.STONE, Material.DIRT));
+        swappedMap.add(new SimpleEntry<>(Material.DIRT, Material.COBBLESTONE));
+        swappedMap.add(new SimpleEntry<>(Material.GRASS, Material.STONE));
+        swappedMap.add(new SimpleEntry<>(Material.GRAVEL, Material.SAND));
+        swappedMap.add(new SimpleEntry<>(Material.SAND, Material.GRAVEL));
+        swappedMap.add(new SimpleEntry<>(Material.IRON_ORE, Material.GOLD_ORE));
+        swappedMap.add(new SimpleEntry<>(Material.COAL_ORE, Material.DIAMOND_ORE));
+        swappedMap.add(new SimpleEntry<>(Material.DIAMOND_ORE, Material.COAL_ORE));
+        swappedMap.add(new SimpleEntry<>(Material.GOLD_ORE, Material.IRON_ORE));
+        swappedMap.add(new SimpleEntry<>(Material.LAVA, Material.WATER));
+        swappedMap.add(new SimpleEntry<>(Material.WATER, Material.LAVA));
+        swappedMap.add(new SimpleEntry<>(Material.LOG, Material.LEAVES));
+        swappedMap.add(new SimpleEntry<>(Material.LOG_2, Material.LEAVES_2));
+        swappedMap.add(new SimpleEntry<>(Material.LEAVES, Material.LOG));
+        swappedMap.add(new SimpleEntry<>(Material.LEAVES_2, Material.LOG_2));
     }
 
     @Override
@@ -43,13 +40,13 @@ public class ChunkReverserReward implements IChanceCubeReward {
 
     @Override
     public String getName() {
-        return CCubesCore.MODID + ":Chuck_Reverse";
+        return CCubesCore.instance().getName().toLowerCase() + ":Chuck_Reverse";
     }
 
     @Override
-    public void trigger(World world, BlockPos pos, EntityPlayer player) {
-        player.addChatMessage(new TextComponentString("Initiating Block Inverter"));
-        List<OffsetBlock> blocks = new ArrayList<OffsetBlock>();
+    public void trigger(Location location, Player player) {
+        player.sendMessage("Initiating Block Inverter");
+        List<OffsetBlock> blocks = new ArrayList<>();
         int delay = 0;
         for (int yy = 256; yy > 0; yy--) {
             int xx = 0, zz = 0, dx = 0, dy = -1;
@@ -58,15 +55,14 @@ public class ChunkReverserReward implements IChanceCubeReward {
 
             for (int i = 0; i < maxI; i++) {
                 if ((-16 / 2 <= xx) && (xx <= 16 / 2) && (-16 / 2 <= zz) && (zz <= 16 / 2)) {
-                    Block blockAt = world.getBlockState(new BlockPos(pos.getX() + xx, yy, pos.getZ() + zz)).getBlock();
-                    Block toSwapTo = null;
-                    for (Entry<Block, Block> blockSwap : swappedMap) {
-                        if (blockSwap.getKey().equals(blockAt)) {
+                    Material blockAt = new Location(location.getWorld(), location.getX() + xx, yy, location.getZ() + zz).getBlock().getType();
+                    Material toSwapTo = null;
+                    for (Entry<Material, Material> blockSwap : swappedMap)
+                        if (blockSwap.getKey().equals(blockAt))
                             toSwapTo = blockSwap.getValue();
-                        }
-                    }
+
                     if (toSwapTo != null) {
-                        blocks.add(new OffsetBlock(xx, yy - pos.getY(), zz, toSwapTo, false, delay / 5));
+                        blocks.add(new OffsetBlock(xx, yy - location.getBlockY(), zz, toSwapTo, false, delay / 5));
                         delay++;
                     }
                 }
@@ -76,14 +72,15 @@ public class ChunkReverserReward implements IChanceCubeReward {
                     dx = -dy;
                     dy = t;
                 }
+
                 xx += dx;
                 zz += dy;
             }
         }
 
-        player.addChatMessage(new TextComponentString("Inverting " + blocks.size() + " Blocks... May take a minute..."));
+        player.sendMessage("Inverting " + blocks.size() + " Blocks... May take a minute...");
         for (OffsetBlock b : blocks)
-            b.spawnInWorld(world, pos.getX(), pos.getY(), pos.getZ());
+            b.spawnInWorld(location);
     }
 
 }

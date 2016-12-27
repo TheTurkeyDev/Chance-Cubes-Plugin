@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.server.v1_10_R1.Block;
-import net.minecraft.server.v1_10_R1.Blocks;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,7 +44,7 @@ public class RandomBioDome implements IBioDomeBiome {
             for (int zz = -1; zz < 2; zz++) {
                 for (int yy = 0; yy < 2; yy++) {
                     if ((yy == 1 && (xx == 0 || zz == 0)) || (yy == 0)) {
-                        ItemStack itemStack = nmsBlockToBukkitStack(RewardsUtil.getRandomOre().getKey());
+                        ItemStack itemStack = new ItemStack(RewardsUtil.getRandomOre());
                         OffsetBlock osb = new OffsetBlock(x + xx, y + 1 + yy, z + zz, itemStack.getType(), itemStack.getData(), false, delay);
                         blocks.add(osb);
                         delay++;
@@ -53,7 +53,7 @@ public class RandomBioDome implements IBioDomeBiome {
             }
         }
 
-        ItemStack itemStack = nmsBlockToBukkitStack(RewardsUtil.getRandomOre().getKey());
+        ItemStack itemStack = new ItemStack(RewardsUtil.getRandomOre());
         OffsetBlock osb = new OffsetBlock(x, y + 3, z, itemStack.getType(), itemStack.getData(), false, delay);
         blocks.add(osb);
         return blocks;
@@ -72,8 +72,8 @@ public class RandomBioDome implements IBioDomeBiome {
     }
 
     @Override
-    public Block getFloorBlock() {
-        return Blocks.OBSIDIAN;
+    public Material getFloorBlock() {
+        return Material.OBSIDIAN;
     }
 
     @Override

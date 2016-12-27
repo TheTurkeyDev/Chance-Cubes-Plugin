@@ -5,11 +5,11 @@ import chanceCubes.rewards.rewardparts.OffsetBlock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import net.minecraft.server.v1_10_R1.Block;
-import net.minecraft.server.v1_10_R1.BlockTallPlant;
-import net.minecraft.server.v1_10_R1.Blocks;
+import org.bukkit.GrassSpecies;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
+import org.bukkit.material.LongGrass;
 
 public class BasicTreesBiome implements IBioDomeBiome {
 
@@ -19,7 +19,7 @@ public class BasicTreesBiome implements IBioDomeBiome {
         List<OffsetBlock> blocks = new ArrayList<>();
 
         for (int yy = 1; yy < 6; yy++) {
-            blocks.add(new OffsetBlock(x, y + yy, z, Blocks.LOG, false, delay));
+            blocks.add(new OffsetBlock(x, y + yy, z, Material.LOG, false, delay));
             delay++;
         }
 
@@ -27,30 +27,30 @@ public class BasicTreesBiome implements IBioDomeBiome {
             for (int zz = -2; zz < 3; zz++) {
                 for (int yy = 0; yy < 2; yy++) {
                     if ((xx != 0 || zz != 0)) {
-                        blocks.add(new OffsetBlock(x + xx, y + 4 + yy, z + zz, Blocks.LEAVES, false, delay));
+                        blocks.add(new OffsetBlock(x + xx, y + 4 + yy, z + zz, Material.LEAVES, false, delay));
                         delay++;
                     }
                 }
             }
         }
 
-        blocks.add(new OffsetBlock(x + 1, y + 6, z, Blocks.LEAVES, false, delay));
+        blocks.add(new OffsetBlock(x + 1, y + 6, z, Material.LEAVES, false, delay));
         delay++;
-        blocks.add(new OffsetBlock(x - 1, y + 6, z, Blocks.LEAVES, false, delay));
+        blocks.add(new OffsetBlock(x - 1, y + 6, z, Material.LEAVES, false, delay));
         delay++;
-        blocks.add(new OffsetBlock(x, y + 6, z + 1, Blocks.LEAVES, false, delay));
+        blocks.add(new OffsetBlock(x, y + 6, z + 1, Material.LEAVES, false, delay));
         delay++;
-        blocks.add(new OffsetBlock(x, y + 6, z - 1, Blocks.LEAVES, false, delay));
+        blocks.add(new OffsetBlock(x, y + 6, z - 1, Material.LEAVES, false, delay));
         delay++;
-        blocks.add(new OffsetBlock(x, y + 6, z, Blocks.LEAVES, false, delay));
+        blocks.add(new OffsetBlock(x, y + 6, z, Material.LEAVES, false, delay));
         delay++;
 
         return blocks;
     }
 
     @Override
-    public Block getFloorBlock() {
-        return Blocks.GRASS;
+    public Material getFloorBlock() {
+        return Material.GRASS;
     }
 
     @Override
@@ -58,8 +58,7 @@ public class BasicTreesBiome implements IBioDomeBiome {
         if (y != 0)
             return;
         if (dist < 0 && rand.nextInt(5) == 0) {
-            OffsetBlock osb = new OffsetBlock(x, y + 1, z, Blocks.TALLGRASS, false, (delay / BioDomeReward.delayShorten));
-            osb.setBlockState(Blocks.TALLGRASS.getBlockData().set(BlockTallPlant.VARIANT, BlockTallPlant.EnumTallFlowerVariants.GRASS));
+            OffsetBlock osb = new OffsetBlock(x, y + 1, z, Material.LONG_GRASS, new LongGrass(GrassSpecies.NORMAL), false, (delay / BioDomeReward.delayShorten));
             blocks.add(osb);
         }
         else if (dist < -5 && rand.nextInt(100) == 0) {

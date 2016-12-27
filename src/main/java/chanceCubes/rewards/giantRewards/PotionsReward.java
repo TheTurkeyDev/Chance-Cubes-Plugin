@@ -2,22 +2,26 @@ package chanceCubes.rewards.giantRewards;
 
 import chanceCubes.CCubesCore;
 import chanceCubes.rewards.defaultRewards.IChanceCubeReward;
-import chanceCubes.util.Scheduler;
-import chanceCubes.util.Task;
+import chanceCubes.util.RewardsUtil;
 import java.util.Random;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityPotion;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionType;
-import net.minecraft.potion.PotionUtils;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
+import java.util.Set;
+import java.util.stream.Collectors;
+import net.minecraft.server.v1_10_R1.MinecraftKey;
+import net.minecraft.server.v1_10_R1.MobEffectList;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_10_R1.potion.CraftPotionUtil;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.util.Vector;
 
 public class PotionsReward implements IChanceCubeReward {
 
-    private EntityPotion pot;
+    private ThrownPotion potion;
     private Random rand = new Random();
 
     @Override
@@ -27,62 +31,46 @@ public class PotionsReward implements IChanceCubeReward {
 
     @Override
     public String getName() {
-        return CCubesCore.MODID + ":Raining_Potions";
+        return CCubesCore.instance().getName().toLowerCase() + ":Raining_Potions";
     }
 
-    private void throwPoiton(final int itteration, final World world, final BlockPos pos, final EntityPlayer player) {
-        for (double yy = -0.2; yy <= 1; yy += 0.1) {
-            PotionType potionType = PotionType.REGISTRY.getObjectById(rand.nextInt(PotionType.REGISTRY.getKeys().size()));
-            pot = new EntityPotion(world, player, PotionUtils.addPotionToItemStack(new ItemStack(Items.SPLASH_POTION), potionType));
-            pot.setLocationAndAngles(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
-            pot.motionX = Math.cos(itteration * (Math.PI / 30));
-            pot.motionY = yy;
-            pot.motionZ = Math.sin(itteration * (Math.PI / 30));
-            world.spawnEntityInWorld(pot);
-        }
-
-        if (itteration < 200) {
-            Scheduler.scheduleTask(new Task("Potion Circle", 2) {
-                @Override
-                public void callback() {
-                    throwPoiton(itteration + 1, world, pos, player);
-                }
-            });
-        }
+    private ItemStack getRandomPotionItem() {
+        ItemStack itemStack = new ItemStack(Material.SPLASH_POTION);
+        PotionMeta meta = (PotionMeta) itemStack.getItemMeta();
+        Set<MinecraftKey> set = MobEffectList.REGISTRY.keySet();
+        PotionData potionData = CraftPotionUtil.toBukkit(set.stream().collect(Collectors.toList()).get(rand.nextInt(set.size())).toString());
+        meta.setBasePotionData(potionData);
+        itemStack.setItemMeta(meta);
+        return itemStack;
     }
 
-    private void throwPoitonCircle(final int itteration, final World world, final BlockPos pos, final EntityPlayer player) {
-        for (double rad = -Math.PI; rad <= Math.PI; rad += (Math.PI / 20)) {
-            PotionType potionType = PotionType.REGISTRY.getObjectById(rand.nextInt(PotionType.REGISTRY.getKeys().size()));
-            pot = new EntityPotion(world, player, PotionUtils.addPotionToItemStack(new ItemStack(Items.SPLASH_POTION), potionType));
-            pot.setLocationAndAngles(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
-            pot.motionX = Math.cos(rad) * (0.1 + (0.05 * itteration));
-            pot.motionY = 1;
-            pot.motionZ = Math.sin(rad) * (0.1 + (0.05 * itteration));
-            world.spawnEntityInWorld(pot);
-        }
+    private ThrownPotion spawnThrownPotion(Location location, Vector velocity) {
+        ThrownPotion potion = (ThrownPotion) location.getWorld().spawnEntity(location.clone().add(0.5, 0, 0.5), EntityType.SPLASH_POTION);
+        potion.setItem(getRandomPotionItem());
+        potion.setVelocity(velocity);
+        return potion;
+    }
 
-        if (itteration < 5) {
-            Scheduler.scheduleTask(new Task("Potion Circle", 20) {
-                @Override
-                public void callback() {
-                    throwPoitonCircle(itteration + 1, world, pos, player);
-                }
-            });
-        }
+    private void throwPotion(final int iteration, final Location location) {
+        for (double yy = -0.2; yy <= 1; yy += 0.1)
+            spawnThrownPotion(location, new Vector(Math.cos(iteration * (Math.PI / 30)), yy, Math.sin(iteration * (Math.PI / 30))));
+
+        if (iteration < 200)
+            RewardsUtil.scheduleTask(() -> throwPotion(iteration + 1, location), 2);
+    }
+
+    private void throwPotionCircle(final int iteration, final Location location) {
+        for (double rad = -Math.PI; rad <= Math.PI; rad += (Math.PI / 20))
+            spawnThrownPotion(location, new Vector(Math.cos(rad) * (0.1 + (0.05 * iteration)), 1, Math.sin(rad) * (0.1 + (0.05 * iteration))));
+
+        if (iteration < 5)
+            RewardsUtil.scheduleTask(() -> throwPotionCircle(iteration + 1, location), 20);
     }
 
     @Override
-    public void trigger(final World world, final BlockPos pos, final EntityPlayer player) {
-        player.addChatMessage(new TextComponentString("It's called art! Look it up!"));
-        throwPoitonCircle(0, world, pos, player);
-
-        Scheduler.scheduleTask(new Task("Potion Circle", 140) {
-            @Override
-            public void callback() {
-                throwPoiton(0, world, pos, player);
-            }
-        });
+    public void trigger(final Location location, final Player player) {
+        player.sendMessage("It's called art! Look it up!");
+        throwPotionCircle(0, location);
+        RewardsUtil.scheduleTask(() -> throwPotion(0, location), 140);
     }
-
 }

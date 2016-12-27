@@ -4,9 +4,8 @@ import chanceCubes.rewards.giantRewards.BioDomeReward;
 import chanceCubes.rewards.rewardparts.OffsetBlock;
 import java.util.List;
 import java.util.Random;
-import net.minecraft.server.v1_10_R1.Block;
-import net.minecraft.server.v1_10_R1.Blocks;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 public class NetherBiome implements IBioDomeBiome {
@@ -14,8 +13,8 @@ public class NetherBiome implements IBioDomeBiome {
     private Random rand = new Random();
 
     @Override
-    public Block getFloorBlock() {
-        return Blocks.NETHERRACK;
+    public Material getFloorBlock() {
+        return Material.NETHERRACK;
     }
 
     @Override
@@ -24,15 +23,15 @@ public class NetherBiome implements IBioDomeBiome {
             return;
 
         if (dist < 0 && rand.nextInt(50) == 0) {
-            OffsetBlock osb = new OffsetBlock(x, y - 1, z, Blocks.NETHERRACK, false, (delay / BioDomeReward.delayShorten));
+            OffsetBlock osb = new OffsetBlock(x, y - 1, z, Material.NETHERRACK, false, (delay / BioDomeReward.delayShorten));
             blocks.add(osb);
             delay++;
-            osb = new OffsetBlock(x, y, z, Blocks.LAVA, false, (delay / BioDomeReward.delayShorten) + 1);
+            osb = new OffsetBlock(x, y, z, Material.LAVA, false, (delay / BioDomeReward.delayShorten) + 1);
             blocks.add(osb);
             delay++;
         }
         else if (dist < 0 && rand.nextInt(20) == 0) {
-            OffsetBlock osb = new OffsetBlock(x, y, z, Blocks.SOUL_SAND, false, (delay / BioDomeReward.delayShorten) + 1);
+            OffsetBlock osb = new OffsetBlock(x, y, z, Material.SOUL_SAND, false, (delay / BioDomeReward.delayShorten) + 1);
             blocks.add(osb);
             delay++;
         }

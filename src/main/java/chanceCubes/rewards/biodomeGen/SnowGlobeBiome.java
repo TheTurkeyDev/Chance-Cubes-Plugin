@@ -5,10 +5,9 @@ import chanceCubes.rewards.giantRewards.BioDomeReward;
 import chanceCubes.rewards.rewardparts.OffsetBlock;
 import java.util.List;
 import java.util.Random;
-import net.minecraft.server.v1_10_R1.Block;
-import net.minecraft.server.v1_10_R1.Blocks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 public class SnowGlobeBiome implements IBioDomeBiome {
@@ -16,8 +15,8 @@ public class SnowGlobeBiome implements IBioDomeBiome {
     private Random rand = new Random();
 
     @Override
-    public Block getFloorBlock() {
-        return Blocks.SNOW;
+    public Material getFloorBlock() {
+        return Material.SNOW;
     }
 
     @Override
@@ -25,7 +24,7 @@ public class SnowGlobeBiome implements IBioDomeBiome {
         if (y != 0)
             return;
         if (dist < 0 && rand.nextInt(5) == 0) {
-            OffsetBlock osb = new OffsetBlock(x, y + 1, z, Blocks.SNOW_LAYER, false, (delay / BioDomeReward.delayShorten));
+            OffsetBlock osb = new OffsetBlock(x, y + 1, z, Material.SNOW, false, (delay / BioDomeReward.delayShorten));
             blocks.add(osb);
         }
     }

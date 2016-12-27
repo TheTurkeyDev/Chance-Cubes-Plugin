@@ -4,9 +4,8 @@ import chanceCubes.rewards.giantRewards.BioDomeReward;
 import chanceCubes.rewards.rewardparts.OffsetBlock;
 import java.util.List;
 import java.util.Random;
-import net.minecraft.server.v1_10_R1.Block;
-import net.minecraft.server.v1_10_R1.Blocks;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
@@ -15,15 +14,15 @@ public class OceanBiome implements IBioDomeBiome {
     private Random rand = new Random();
 
     @Override
-    public Block getFloorBlock() {
-        return Blocks.CLAY;
+    public Material getFloorBlock() {
+        return Material.CLAY;
     }
 
     @Override
     public void getRandomGenBlock(float dist, Random rand, int x, int y, int z, List<OffsetBlock> blocks, int delay) {
         if (y == 0 || dist >= 0)
             return;
-        blocks.add(new OffsetBlock(x, y, z, Blocks.WATER, false, delay / BioDomeReward.delayShorten));
+        blocks.add(new OffsetBlock(x, y, z, Material.WATER, false, delay / BioDomeReward.delayShorten));
     }
 
     @Override

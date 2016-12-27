@@ -24,7 +24,7 @@ repositories {
     }
     maven {
         name = 'sonatype'
-        url = 'https:/oss.sonatype.org/content/groups/public/'
+        url = 'https://oss.sonatype.org/content/groups/public/'
     }
 }
 

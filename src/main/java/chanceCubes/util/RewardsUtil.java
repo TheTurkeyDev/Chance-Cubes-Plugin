@@ -17,7 +17,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
@@ -67,7 +66,7 @@ public class RewardsUtil {
      * @param xSize
      * @param ySize
      * @param zSize
-     * @param block
+     * @param material
      * @param xOff
      * @param yOff
      * @param zOff
@@ -77,12 +76,12 @@ public class RewardsUtil {
      * @param relativeToPlayer
      * @return
      */
-    public static OffsetBlock[] fillArea(int xSize, int ySize, int zSize, Block block, int xOff, int yOff, int zOff, boolean falling, int delay, boolean causesUpdate, boolean relativeToPlayer) {
+    public static OffsetBlock[] fillArea(int xSize, int ySize, int zSize, Material material, int xOff, int yOff, int zOff, boolean falling, int delay, boolean causesUpdate, boolean relativeToPlayer) {
         List<OffsetBlock> toReturn = new ArrayList<>();
         for (int y = 0; y < ySize; y++)
             for (int z = 0; z < zSize; z++)
                 for (int x = 0; x < xSize; x++)
-                    toReturn.add(new OffsetBlock(x + xOff, y + yOff, z + zOff, block.getType(), block.getState().getData(), falling, delay).setCausesBlockUpdate(causesUpdate).setRelativeToPlayer(relativeToPlayer));
+                    toReturn.add(new OffsetBlock(x + xOff, y + yOff, z + zOff, material, falling, delay).setCausesBlockUpdate(causesUpdate).setRelativeToPlayer(relativeToPlayer));
 
         return toReturn.toArray(new OffsetBlock[toReturn.size()]);
     }

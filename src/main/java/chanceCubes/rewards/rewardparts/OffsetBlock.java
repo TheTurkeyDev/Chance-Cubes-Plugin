@@ -56,6 +56,10 @@ public class OffsetBlock {
         return this.material;
     }
 
+    public MaterialData getMaterialData() {
+        return materialData;
+    }
+
     public int getDelay() {
         return this.delay;
     }

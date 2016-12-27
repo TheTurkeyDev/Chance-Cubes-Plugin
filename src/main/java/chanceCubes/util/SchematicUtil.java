@@ -12,89 +12,93 @@ import com.google.gson.JsonPrimitive;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTException;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.server.v1_10_R1.Block;
+import net.minecraft.server.v1_10_R1.BlockPosition;
+import net.minecraft.server.v1_10_R1.IBlockData;
+import net.minecraft.server.v1_10_R1.MinecraftKey;
+import net.minecraft.server.v1_10_R1.MojangsonParseException;
+import net.minecraft.server.v1_10_R1.MojangsonParser;
+import net.minecraft.server.v1_10_R1.NBTCompressedStreamTools;
+import net.minecraft.server.v1_10_R1.NBTTagCompound;
+import net.minecraft.server.v1_10_R1.NBTTagList;
+import net.minecraft.server.v1_10_R1.TileEntity;
+import net.minecraft.server.v1_10_R1.World;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_10_R1.util.CraftMagicNumbers;
+import org.bukkit.material.MaterialData;
 
 public class SchematicUtil {
 
-    public static BlockPos[] selectionPoints = new BlockPos[2];
+    public static Location[] selectionPoints = new Location[2];
     private static Gson gson = new GsonBuilder().create();
 
     public static OffsetTileEntity OffsetBlockToTileEntity(OffsetBlock osb, String nbt) {
         try {
-            return OffsetBlockToTileEntity(osb, (NBTTagCompound) JsonToNBT.getTagFromJson(nbt));
+            return OffsetBlockToTileEntity(osb, MojangsonParser.parse(nbt));
         }
-        catch (NBTException e) {
+        catch (MojangsonParseException e) {
             e.printStackTrace();
             return null;
         }
     }
 
     public static OffsetTileEntity OffsetBlockToTileEntity(OffsetBlock osb, NBTTagCompound nbt) {
-        OffsetTileEntity oste = new OffsetTileEntity(osb.xOff, osb.yOff, osb.zOff, osb.getMaterial(), nbt, osb.isFalling(), osb.getDelay());
-        oste.setBlockState(osb.getBlockState());
-        oste.setDelay(osb.getDelay());
+        OffsetTileEntity oste = new OffsetTileEntity(osb.xOff, osb.yOff, osb.zOff, osb.getMaterial(), osb.getMaterialData(), nbt, osb.isFalling(), osb.getDelay());
         oste.setRelativeToPlayer(osb.isRelativeToPlayer());
         oste.setFalling(osb.isFalling());
         return oste;
     }
 
-    public static void createCustomSchematic(World world, BlockPos loc1, BlockPos loc2, String fileName) {
-        List<Integer> blocks = new ArrayList<Integer>();
-        List<CustomEntry<Integer, String>> blockDataIds = new ArrayList<CustomEntry<Integer, String>>();
-        List<CustomEntry<String, List<Integer>>> tileEntityData = new ArrayList<CustomEntry<String, List<Integer>>>();
-        int largeX = loc1.getX() > loc2.getX() ? loc1.getX() : loc2.getX();
-        int smallX = loc1.getX() < loc2.getX() ? loc1.getX() : loc2.getX();
-        int largeY = loc1.getY() > loc2.getY() ? loc1.getY() : loc2.getY();
-        int smallY = loc1.getY() < loc2.getY() ? loc1.getY() : loc2.getY();
-        int largeZ = loc1.getZ() > loc2.getZ() ? loc1.getZ() : loc2.getZ();
-        int smallZ = loc1.getZ() < loc2.getZ() ? loc1.getZ() : loc2.getZ();
+    public static void createCustomSchematic(Location loc1, Location loc2, String fileName) {
+        World world = ((CraftWorld) loc1.getWorld()).getHandle();
+        List<Integer> blocks = new ArrayList<>();
+        List<SimpleEntry<Integer, String>> blockDataIds = new ArrayList<>();
+        List<SimpleEntry<String, List<Integer>>> tileEntityData = new ArrayList<>();
+        int largeX = Math.max(loc1.getBlockX(), loc2.getBlockX());
+        int smallX = Math.min(loc1.getBlockX(), loc2.getBlockX());
+        int largeY = Math.max(loc1.getBlockY(), loc2.getBlockY());
+        int smallY = Math.min(loc1.getBlockY(), loc2.getBlockY());
+        int largeZ = Math.max(loc1.getBlockZ(), loc2.getBlockZ());
+        int smallZ = Math.min(loc1.getBlockZ(), loc2.getBlockZ());
         for (int y = smallY; y < largeY; y++) {
             for (int x = smallX; x < largeX; x++) {
                 for (int z = smallZ; z < largeZ; z++) {
-                    BlockPos pos = new BlockPos(x, y, z);
-                    IBlockState blockState = world.getBlockState(pos);
-                    String blockData = blockState.getBlock().getRegistryName().toString();
-                    // TODO: Find better way?
-                    blockData += ":" + blockState.getBlock().getMetaFromState(blockState);
+                    BlockPosition pos = new BlockPosition(x, y, z);
+                    IBlockData state = world.c(pos);
+                    MinecraftKey mk = Block.REGISTRY.b(state.getBlock());
+                    //TODO need to look into a way to easily grab a non magic value for the variants
+                    String blockData = mk.toString() + ":" + state.getBlock().toLegacyData(state);
                     int id = -1;
-                    for (CustomEntry<Integer, String> data : blockDataIds) {
-                        if (blockData.equalsIgnoreCase(data.getValue())) {
+                    for (Entry<Integer, String> data : blockDataIds)
+                        if (blockData.equalsIgnoreCase(data.getValue()))
                             id = data.getKey();
-                        }
-                    }
+
                     if (id == -1) {
                         id = blockDataIds.size();
-                        blockDataIds.add(new CustomEntry<Integer, String>(id, blockData));
+                        blockDataIds.add(new SimpleEntry<>(id, blockData));
                     }
-                    blocks.add(id);
 
-                    if (world.getTileEntity(pos) != null) {
-                        TileEntity te = world.getTileEntity(pos);
-                        NBTTagCompound nbt = new NBTTagCompound();
-                        te.writeToNBT(nbt);
-                        for (CustomEntry<String, List<Integer>> data : tileEntityData) {
+                    blocks.add(id);
+                    //TODO left off here
+                    TileEntity te = world.getTileEntity(pos);
+                    if (te != null) {
+                        NBTTagCompound nbt = te.save(new NBTTagCompound());
+                        for (SimpleEntry<String, List<Integer>> data : tileEntityData) {
                             if (nbt.toString().equalsIgnoreCase(data.getKey())) {
                                 data.getValue().add(blocks.size() - 1);
                                 break;
                             }
                         }
-                        List<Integer> list = new ArrayList<Integer>();
+
+                        List<Integer> list = new ArrayList<>();
                         list.add(blocks.size() - 1);
-                        tileEntityData.add(new CustomEntry<String, List<Integer>>(nbt.toString(), list));
+                        tileEntityData.add(new SimpleEntry<>(nbt.toString(), list));
                     }
                 }
             }
@@ -131,7 +135,7 @@ public class SchematicUtil {
         json.add("Blocks", blockArray);
 
         JsonArray blockDataArray = new JsonArray();
-        for (CustomEntry<Integer, String> i : blockDataIds) {
+        for (SimpleEntry<Integer, String> i : blockDataIds) {
             JsonObject index = new JsonObject();
             index.addProperty(i.getValue(), i.getKey());
             blockDataArray.add(index);
@@ -139,7 +143,7 @@ public class SchematicUtil {
         json.add("Block Data", blockDataArray);
 
         JsonArray tileEntityDataArray = new JsonArray();
-        for (CustomEntry<String, List<Integer>> i : tileEntityData) {
+        for (SimpleEntry<String, List<Integer>> i : tileEntityData) {
             JsonObject index = new JsonObject();
             JsonArray tileEntityBlockIds = new JsonArray();
             for (int id : i.getValue())
@@ -168,22 +172,22 @@ public class SchematicUtil {
         if (elem == null)
             return null;
         JsonObject json = elem.getAsJsonObject();
-        List<OffsetBlock> offsetBlocks = new ArrayList<OffsetBlock>();
+        List<OffsetBlock> offsetBlocks = new ArrayList<>();
         JsonObject info = json.get("Schematic Data").getAsJsonObject();
         int xSize = info.get("xSize").getAsInt();
         int ySize = info.get("ySize").getAsInt();
         int zSize = info.get("zSize").getAsInt();
-        List<CustomEntry<Integer, String>> blockDataIds = new ArrayList<CustomEntry<Integer, String>>();
+        List<SimpleEntry<Integer, String>> blockDataIds = new ArrayList<>();
 
         JsonArray blockDataArray = json.get("Block Data").getAsJsonArray();
         for (JsonElement i : blockDataArray) {
             JsonObject index = i.getAsJsonObject();
             for (Entry<String, JsonElement> obj : index.entrySet())
-                blockDataIds.add(new CustomEntry<Integer, String>(obj.getValue().getAsInt(), obj.getKey()));
+                blockDataIds.add(new SimpleEntry<>(obj.getValue().getAsInt(), obj.getKey()));
         }
 
         int index = 0;
-        List<Integer> blockArray = new ArrayList<Integer>();
+        List<Integer> blockArray = new ArrayList<>();
         for (JsonElement ids : json.get("Blocks").getAsJsonArray()) {
             String entry = ids.getAsString();
             String[] parts = entry.split("x");
@@ -198,17 +202,19 @@ public class SchematicUtil {
                 for (int zOff = (zSize / 2) - zSize; zOff < (zSize / 2); zOff++) {
                     int id = blockArray.get(index);
                     String blockData = "";
-                    for (CustomEntry<Integer, String> entry : blockDataIds) {
+                    for (SimpleEntry<Integer, String> entry : blockDataIds) {
                         if (entry.getKey() == id) {
                             blockData = entry.getValue();
                             break;
                         }
                     }
+
                     String[] dataParts = blockData.split(":");
-                    Block b = Block.REGISTRY.getObject(new ResourceLocation(dataParts[0], dataParts[1]));
-                    OffsetBlock osb = new OffsetBlock(xOff + xOffSet, yOff + yOffSet, zOff + zOffSet, b, falling, 0);
-                    // TODO: Find better way?
-                    osb.setBlockState(b.getStateFromMeta(Integer.parseInt(dataParts[2])));
+                    Material m = CraftMagicNumbers.getMaterial(Block.REGISTRY.get(new MinecraftKey(dataParts[0], dataParts[1])));
+                    MaterialData data = new MaterialData(m);
+                    //TODO Still need to try and find a better way to do this
+                    data.setData(Byte.parseByte(dataParts[2]));
+                    OffsetBlock osb = new OffsetBlock(xOff + xOffSet, yOff + yOffSet, zOff + zOffSet, m, data, falling, 0);
                     osb.setRelativeToPlayer(relativeToPlayer);
                     offsetBlocks.add(osb);
                     index++;
@@ -232,7 +238,7 @@ public class SchematicUtil {
 
         for (int i = offsetBlocks.size() - 1; i >= 0; i--) {
             OffsetBlock osb = offsetBlocks.get(i);
-            if (osb.getMaterial().equals(Blocks.AIR) && !includeAirBlocks)
+            if (osb.getMaterial() == Material.AIR && !includeAirBlocks)
                 offsetBlocks.remove(i);
         }
 
@@ -244,7 +250,7 @@ public class SchematicUtil {
         NBTTagCompound nbtdata;
         try {
             FileInputStream is = new FileInputStream(schematic);
-            nbtdata = CompressedStreamTools.readCompressed(is);
+            nbtdata = NBTCompressedStreamTools.a(is);
             is.close();
         }
         catch (IOException e) {
@@ -258,9 +264,9 @@ public class SchematicUtil {
 
         byte[] blocks = nbtdata.getByteArray("Blocks");
         byte[] data = nbtdata.getByteArray("Data");
-        List<OffsetBlock> offsetBlocks = new ArrayList<OffsetBlock>();
+        List<OffsetBlock> offsetBlocks = new ArrayList<>();
 
-        NBTTagList tileentities = nbtdata.getTagList("TileEntities", 10);
+        NBTTagList tileentities = nbtdata.getList("TileEntities", 10);
 
         int i = 0;
         short halfLength = (short) (length / 2);
@@ -273,33 +279,38 @@ public class SchematicUtil {
                     if (j < 0)
                         j = 128 + (128 + j);
 
-                    Block b = Block.getBlockById(j);
-                    if (b != Blocks.AIR) {
-                        OffsetBlock block = new OffsetBlock(halfWidth - xx, yy, halfLength - zz, b, falling);
+                    Material m = CraftMagicNumbers.getMaterial(Block.getById(j));
+                    if (m != Material.AIR) {
+                        MaterialData materialData = new MaterialData(m);
+                        materialData.setData(data[i]);
+                        OffsetBlock block = new OffsetBlock(halfWidth - xx, yy, halfLength - zz, m, materialData, falling);
                         block.setRelativeToPlayer(relativeToPlayer);
-                        block.setBlockState(b.getStateFromMeta(data[i]));
                         offsetBlocks.add(block);
                     }
+                    
                     i++;
                 }
             }
         }
 
         if (tileentities != null) {
-            for (int i1 = 0; i1 < tileentities.tagCount(); ++i1) {
-                NBTTagCompound nbttagcompound4 = tileentities.getCompoundTagAt(i1);
-                TileEntity tileentity = TileEntity.func_190200_a(null, nbttagcompound4);
+            for (int i1 = 0; i1 < tileentities.size(); ++i1) {
+                NBTTagCompound nbttagcompound4 = tileentities.get(i1);
+                TileEntity tileentity = TileEntity.a(null, nbttagcompound4);
 
                 if (tileentity != null) {
-                    Block b = null;
+                    Material m = null;
                     for (OffsetBlock osb : offsetBlocks)
-                        if (osb.xOff == tileentity.getPos().getX() && osb.yOff == tileentity.getPos().getY() && osb.zOff == tileentity.getPos().getZ())
-                            b = osb.getMaterial();
-                    if (b == null)
-                        b = Blocks.STONE;
-                    OffsetTileEntity block = new OffsetTileEntity(tileentity.getPos().getX(), tileentity.getPos().getY(), tileentity.getPos().getZ(), b, nbttagcompound4, falling);
+                        if (osb.xOff == tileentity.getPosition().getX() && osb.yOff == tileentity.getPosition().getY() && osb.zOff == tileentity.getPosition().getZ())
+                            m = osb.getMaterial();
+                    
+                    if (m == null)
+                        m = Material.STONE;
+
+                    MaterialData materialData = new MaterialData(m);
+                    materialData.setData(data[i1]);
+                    OffsetTileEntity block = new OffsetTileEntity(tileentity.getPosition().getX(), tileentity.getPosition().getY(), tileentity.getPosition().getZ(), m, materialData, nbttagcompound4, falling);
                     block.setRelativeToPlayer(relativeToPlayer);
-                    block.setBlockState(b.getStateFromMeta(data[i1]));
                     offsetBlocks.add(block);
                 }
             }

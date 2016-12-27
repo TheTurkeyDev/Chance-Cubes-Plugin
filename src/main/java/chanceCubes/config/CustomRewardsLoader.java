@@ -50,25 +50,27 @@ import net.minecraft.server.v1_10_R1.ItemStack;
 import net.minecraft.server.v1_10_R1.MojangsonParseException;
 import net.minecraft.server.v1_10_R1.MojangsonParser;
 import net.minecraft.server.v1_10_R1.NBTTagCompound;
-
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_10_R1.potion.CraftPotionUtil;
+import org.bukkit.craftbukkit.v1_10_R1.util.CraftMagicNumbers;
+import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 
 public class CustomRewardsLoader
 {
-	
+
 	public static CustomRewardsLoader instance;
 	private static JsonParser json;
 	private File folder;
-	
+
 	public CustomRewardsLoader(File folder)
 	{
 		instance = this;
 		this.folder = folder;
 		json = new JsonParser();
-		
+
 		// Custom Sounds not possible
 		/*
 		 * CustomSoundsLoader customSounds = new CustomSoundsLoader(folder, new
@@ -77,15 +79,15 @@ public class CustomRewardsLoader
 		 * customSounds.assemble();
 		 */
 	}
-	
+
 	public int compareDates(Calendar first, Calendar second)
 	{
 		int fm = first.get(Calendar.MONTH);
 		int sm = second.get(Calendar.MONTH);
-		
+
 		int fd = first.get(Calendar.DAY_OF_MONTH);
 		int sd = second.get(Calendar.DAY_OF_MONTH);
-		
+
 		if (fm < sm)
 			return 1;
 		else if (fm == sm)
@@ -93,19 +95,19 @@ public class CustomRewardsLoader
 		else
 			return -2;
 	}
-	
+
 	public File getFolderFile()
 	{
 		return this.folder;
 	}
-	
+
 	public List<String> getReward(String file, String rewardName)
 	{
 		List<String> rewardinfo = Lists.newArrayList();
-		
+
 		File rewardsFile = new File(this.folder.getPath() + "\\" + file);
 		JsonElement fileJson;
-		
+
 		try
 		{
 			fileJson = json.parse(new FileReader(rewardsFile));
@@ -115,7 +117,7 @@ public class CustomRewardsLoader
 			CCubesCore.instance().getLogger().log(Level.WARNING, "Unable to parse the file " + rewardsFile.getName() + ". Skipping file loading.");
 			return null;
 		}
-		
+
 		for (Entry<String, JsonElement> reward : fileJson.getAsJsonObject().entrySet())
 		{
 			JsonObject rewardElements = reward.getValue().getAsJsonObject();
@@ -124,11 +126,11 @@ public class CustomRewardsLoader
 		}
 		return rewardinfo;
 	}
-	
+
 	public List<String> getRewardType(String file, String s, String type)
 	{
 		List<String> rewardinfo = Lists.newArrayList();
-		
+
 		File rewardsFile = new File(this.folder.getPath() + "\\" + file);
 		JsonElement fileJson;
 		try
@@ -140,7 +142,7 @@ public class CustomRewardsLoader
 			CCubesCore.instance().getLogger().log(Level.WARNING, "Unable to parse the file " + rewardsFile.getName() + ". Skipping file loading.");
 			return null;
 		}
-		
+
 		for (Entry<String, JsonElement> reward : fileJson.getAsJsonObject().entrySet())
 		{
 			JsonObject rewardElements = reward.getValue().getAsJsonObject();
@@ -163,7 +165,7 @@ public class CustomRewardsLoader
 		}
 		return rewardinfo;
 	}
-	
+
 	public List<String> getRewardsFiles()
 	{
 		List<String> files = Lists.newArrayList();
@@ -176,13 +178,13 @@ public class CustomRewardsLoader
 		}
 		return files;
 	}
-	
+
 	public List<String> getRewardsFromFile(String file)
 	{
 		List<String> rewards = Lists.newArrayList();
-		
+
 		File rewardsFile = new File(this.folder.getPath() + "\\" + file);
-		
+
 		JsonElement fileJson;
 		try
 		{
@@ -193,13 +195,13 @@ public class CustomRewardsLoader
 			CCubesCore.instance().getLogger().log(Level.WARNING, "Unable to parse the file " + rewardsFile.getName() + ". Skipping file loading.");
 			return null;
 		}
-		
+
 		for (Entry<String, JsonElement> reward : fileJson.getAsJsonObject().entrySet())
 			rewards.add(reward.getKey());
-		
+
 		return rewards;
 	}
-	
+
 	public List<IRewardType> loadBlockReward(JsonArray rawReward, List<IRewardType> rewards)
 	{
 		List<OffsetBlock> blocks = new ArrayList<>();
@@ -212,24 +214,26 @@ public class CustomRewardsLoader
 			String mod = blockDataParts[0];
 			String blockName = blockDataParts[1];
 			Block block = RewardsUtil.getBlock(mod, blockName);
+			Material material = CraftMagicNumbers.getMaterial(block);
 			boolean falling = element.getAsJsonObject().get("Falling").getAsBoolean();
-			
-			OffsetBlock offBlock = new OffsetBlock(x, y, z, block, falling);
+			OffsetBlock offBlock = new OffsetBlock(x, y, z, material, falling);
 			if (element.getAsJsonObject().has("delay"))
 				offBlock.setDelay(element.getAsJsonObject().get("delay").getAsInt());
-			
+
 			if (element.getAsJsonObject().has("RelativeToPlayer"))
 				offBlock.setRelativeToPlayer(element.getAsJsonObject().get("RelativeToPlayer").getAsBoolean());
-			
-			if (blockDataParts.length > 2)
-				offBlock.setBlockState(block.fromLegacyData(Integer.parseInt(blockDataParts[2])));
-			
+
+			if (blockDataParts.length > 2) {
+                MaterialData data = new MaterialData(material);
+                data.setData(Byte.parseByte(blockDataParts[2]));
+			}
+
 			blocks.add(offBlock);
 		}
 		rewards.add(new BlockRewardType(blocks.toArray(new OffsetBlock[blocks.size()])));
 		return rewards;
 	}
-	
+
 	public List<IRewardType> loadChestReward(JsonArray rawReward, List<IRewardType> rewards)
 	{
 		List<ChestChanceItem> items = Lists.newArrayList();
@@ -241,34 +245,34 @@ public class CustomRewardsLoader
 				int meta = 0;
 				if (obj.has("meta"))
 					meta = obj.get("meta").getAsInt();
-				
+
 				int amountMin = 1;
 				if (obj.has("amountMin"))
 					amountMin = obj.get("amountMin").getAsInt();
-				
+
 				int amountMax = 8;
 				if (obj.has("amountMax"))
 					amountMax = obj.get("amountMax").getAsInt();
-				
+
 				items.add(new ChestChanceItem(obj.get("item").getAsString(), meta, obj.get("chance").getAsInt(), amountMin, amountMax));
 			}
 			else
 			{
 				CCubesCore.instance().getLogger().log(Level.WARNING, "A chest reward failed to load do to missing params");
 			}
-			
+
 		}
 		rewards.add(new ChestRewardType(items.toArray(new ChestChanceItem[items.size()])));
 		return rewards;
 	}
-	
+
 	public List<IRewardType> loadCommandReward(JsonArray rawReward, List<IRewardType> rewards)
 	{
 		List<CommandPart> commands = new ArrayList<>();
 		for (JsonElement element : rawReward)
 		{
 			CommandPart command = new CommandPart(element.getAsJsonObject().get("command").getAsString());
-			
+
 			if (element.getAsJsonObject().has("delay"))
 				command.setDelay(element.getAsJsonObject().get("delay").getAsInt());
 			commands.add(command);
@@ -276,7 +280,7 @@ public class CustomRewardsLoader
 		rewards.add(new CommandRewardType(commands.toArray(new CommandPart[commands.size()])));
 		return rewards;
 	}
-	
+
 	public void loadCustomRewards()
 	{
 		for (File f : folder.listFiles())
@@ -297,7 +301,7 @@ public class CustomRewardsLoader
 					CCubesCore.instance().getLogger().log(Level.WARNING, "Parse Error: " + e.getMessage());
 					continue;
 				}
-				
+
 				for (Entry<String, JsonElement> reward : fileJson.getAsJsonObject().entrySet())
 				{
 					SimpleEntry<BasicReward, Boolean> parsedReward = this.parseReward(reward);
@@ -312,16 +316,16 @@ public class CustomRewardsLoader
 					else
 						ChanceCubeRegistry.INSTANCE.registerReward(basicReward);
 				}
-				
+
 				CCubesCore.instance().getLogger().log(Level.INFO, "Loaded custom rewards file " + f.getName());
 			}
 		}
 	}
-	
+
 	public void loadDisabledRewards()
 	{
 		JsonElement disabledRewards;
-		
+
 		try
 		{
 			disabledRewards = HTTPUtil.getWebFile(CCubesSettings.rewardURL + "/DisabledRewards.json");
@@ -332,7 +336,7 @@ public class CustomRewardsLoader
 			CCubesCore.instance().getLogger().log(Level.WARNING, e.getMessage());
 			return;
 		}
-		
+
 		for (Entry<String, JsonElement> version : disabledRewards.getAsJsonObject().entrySet())
 		{
 			String versionString = CCubesCore.instance().getDescription().getVersion();
@@ -345,26 +349,26 @@ public class CustomRewardsLoader
 						boolean removed = ChanceCubeRegistry.INSTANCE.unregisterReward(reward.getAsString());
 						if (!removed)
 							removed = GiantCubeRegistry.INSTANCE.unregisterReward(reward.getAsString());
-						
+
 						CCubesCore.instance().getLogger().log(Level.WARNING, "The reward " + reward.getAsString() + " has been disabled by the mod author due to a bug or some other reason.");
 					}
 				}
 			}
 		}
 	}
-	
+
 	public List<IRewardType> loadEntityReward(JsonArray rawReward, List<IRewardType> rewards)
 	{
 		List<EntityPart> entities = new ArrayList<>();
 		for (JsonElement element : rawReward)
 		{
 			EntityPart ent;
-			
+
 			try
 			{
 				String jsonEdited = this.removedKeyQuotes(element.getAsJsonObject().get("entity").getAsJsonObject().toString());
 				NBTTagCompound nbt = MojangsonParser.parse(jsonEdited);
-				
+
 				if (nbt == null)
 				{
 					CCubesCore.instance().getLogger().log(Level.WARNING, "Failed to convert the JSON to NBT for: " + element.toString());
@@ -382,7 +386,7 @@ public class CustomRewardsLoader
 				e.printStackTrace();
 				continue;
 			}
-			
+
 			if (element.getAsJsonObject().has("delay"))
 				ent.setDelay(element.getAsJsonObject().get("delay").getAsInt());
 			entities.add(ent);
@@ -390,37 +394,37 @@ public class CustomRewardsLoader
 		rewards.add(new EntityRewardType(entities.toArray(new EntityPart[entities.size()])));
 		return rewards;
 	}
-	
+
 	public List<IRewardType> loadExperienceReward(JsonArray rawReward, List<IRewardType> rewards)
 	{
 		List<ExperiencePart> exp = new ArrayList<>();
 		for (JsonElement element : rawReward)
 		{
 			ExperiencePart exppart = new ExperiencePart(element.getAsJsonObject().get("experienceAmount").getAsInt());
-			
+
 			if (element.getAsJsonObject().has("delay"))
 				exppart.setDelay(element.getAsJsonObject().get("delay").getAsInt());
 			if (element.getAsJsonObject().has("numberOfOrbs"))
 				exppart.setNumberofOrbs(element.getAsJsonObject().get("numberOfOrbs").getAsInt());
 			exp.add(exppart);
 		}
-		
+
 		rewards.add(new ExperienceRewardType(exp.toArray(new ExperiencePart[exp.size()])));
 		return rewards;
 	}
-	
+
 	public void loadHolidayRewards()
 	{
 		if (!CCubesSettings.holidayRewards)
 			return;
-		
+
 		DateFormat dateFormat = new SimpleDateFormat("MM/dd");
 		Date date = new Date();
 		Calendar today = Calendar.getInstance();
 		today.setTime(date);
 		JsonElement holidays;
 		String holidayName = "";
-		
+
 		try
 		{
 			holidays = HTTPUtil.getWebFile(CCubesSettings.rewardURL + "/Holidays.json");
@@ -430,7 +434,7 @@ public class CustomRewardsLoader
 			CCubesCore.instance().getLogger().log(Level.WARNING, "Failed to fetch the list of holiday rewards!");
 			return;
 		}
-		
+
 		for (JsonElement holiday : holidays.getAsJsonArray())
 		{
 			Date parsed;
@@ -443,12 +447,12 @@ public class CustomRewardsLoader
 				CCubesCore.instance().getLogger().log(Level.WARNING, "Failed to parse a holiday date. BLAME TURKEY!!!");
 				continue;
 			}
-			
+
 			if (dateFormat.format(date).equalsIgnoreCase(dateFormat.format(parsed)))
 			{
 				holidayName = holiday.getAsJsonObject().get("Name").getAsString();
 			}
-			
+
 			if (holiday.getAsJsonObject().has("Texture") && !holiday.getAsJsonObject().get("Texture").getAsString().equalsIgnoreCase(""))
 			{
 				try
@@ -457,7 +461,7 @@ public class CustomRewardsLoader
 					Calendar end = Calendar.getInstance();
 					start.setTime(dateFormat.parse(holiday.getAsJsonObject().get("Start").getAsString().trim()));
 					end.setTime(dateFormat.parse(holiday.getAsJsonObject().get("End").getAsString().trim()));
-					
+
 					if (this.compareDates(start, today) >= 0 && this.compareDates(end, today) <= 0)
 					{
 						CCubesSettings.hasHolidayTexture = true;
@@ -470,19 +474,19 @@ public class CustomRewardsLoader
 				}
 			}
 		}
-		
+
 		if (holidayName.equalsIgnoreCase(""))
 		{
 			CCubesSettings.holidayRewardTriggered = false;
 			ConfigLoader.save();
 			return;
 		}
-		
+
 		if (!CCubesSettings.holidayRewardTriggered)
 		{
-			
+
 			JsonElement userRewards;
-			
+
 			try
 			{
 				userRewards = HTTPUtil.getWebFile(CCubesSettings.rewardURL + "/HolidayRewards/" + holidayName + ".json");
@@ -493,7 +497,7 @@ public class CustomRewardsLoader
 				CCubesCore.instance().getLogger().log(Level.WARNING, e.getMessage());
 				return;
 			}
-			
+
 			for (Entry<String, JsonElement> reward : userRewards.getAsJsonObject().entrySet())
 			{
 				BasicReward basicReward = this.parseReward(reward).getKey();
@@ -505,7 +509,7 @@ public class CustomRewardsLoader
 			}
 		}
 	}
-	
+
 	public List<IRewardType> loadItemReward(JsonArray rawReward, List<IRewardType> rewards)
 	{
 		List<ItemPart> items = new ArrayList<>();
@@ -513,12 +517,12 @@ public class CustomRewardsLoader
 		{
 			JsonElement element = fullElement.getAsJsonObject().get("item").getAsJsonObject();
 			ItemPart stack;
-			
+
 			try
 			{
 				String jsonEdited = this.removedKeyQuotes(element.toString());
 				NBTTagCompound nbt = MojangsonParser.parse(jsonEdited);
-				
+
 				if (nbt == null)
 				{
 					CCubesCore.instance().getLogger().log(Level.WARNING, "Failed to convert the JSON to NBT for: " + element.toString());
@@ -541,69 +545,69 @@ public class CustomRewardsLoader
 				CCubesCore.instance().getLogger().log(Level.WARNING, e.getMessage());
 				continue;
 			}
-			
+
 			if (fullElement.getAsJsonObject().has("delay"))
 				stack.setDelay(fullElement.getAsJsonObject().get("delay").getAsInt());
-			
+
 			items.add(stack);
 		}
 		rewards.add(new ItemRewardType(items.toArray(new ItemPart[items.size()])));
 		return rewards;
 	}
-	
+
 	public List<IRewardType> loadMessageReward(JsonArray rawReward, List<IRewardType> rewards)
 	{
 		List<MessagePart> msgs = new ArrayList<>();
 		for (JsonElement element : rawReward)
 		{
 			MessagePart message = new MessagePart(element.getAsJsonObject().get("message").getAsString());
-			
+
 			if (element.getAsJsonObject().has("delay"))
 				message.setDelay(element.getAsJsonObject().get("delay").getAsInt());
 			if (element.getAsJsonObject().has("serverWide"))
 				message.setServerWide(element.getAsJsonObject().get("serverWide").getAsBoolean());
 			if (element.getAsJsonObject().has("range"))
 				message.setRange(element.getAsJsonObject().get("range").getAsInt());
-			
+
 			msgs.add(message);
 		}
 		rewards.add(new MessageRewardType(msgs.toArray(new MessagePart[msgs.size()])));
 		return rewards;
 	}
-	
+
 	public List<IRewardType> loadParticleReward(JsonArray rawReward, List<IRewardType> rewards)
 	{
 		List<ParticlePart> particles = new ArrayList<ParticlePart>();
 		for (JsonElement element : rawReward)
 		{
-			
+
 			ParticlePart particle = new ParticlePart(Particle.valueOf(element.getAsJsonObject().get("particle").getAsString().toUpperCase()));
-			
+
 			if (element.getAsJsonObject().has("delay"))
 				particle.setDelay(element.getAsJsonObject().get("delay").getAsInt());
-			
+
 			particles.add(particle);
 		}
 		rewards.add(new ParticleEffectRewardType(particles.toArray(new ParticlePart[particles.size()])));
 		return rewards;
 	}
-	
+
 	public List<IRewardType> loadPotionReward(JsonArray rawReward, List<IRewardType> rewards)
 	{
 		List<PotionPart> potionEffects = new ArrayList<>();
 		for (JsonElement element : rawReward)
 		{
 			PotionPart exppart = new PotionPart(new PotionEffect(CraftPotionUtil.toBukkit(element.getAsJsonObject().get("potionid").getAsString()).getType().getEffectType(), element.getAsJsonObject().get("duration").getAsInt() * 20, 1));
-			
+
 			if (element.getAsJsonObject().has("delay"))
 				exppart.setDelay(element.getAsJsonObject().get("delay").getAsInt());
-			
+
 			potionEffects.add(exppart);
 		}
 		rewards.add(new PotionRewardType(potionEffects.toArray(new PotionPart[potionEffects.size()])));
 		return rewards;
 	}
-	
+
 	public List<IRewardType> loadSchematicReward(JsonArray rawReward, List<IRewardType> rewards)
 	{
 		rawReward.forEach(element -> {
@@ -618,40 +622,40 @@ public class CustomRewardsLoader
 			boolean includeAirBlocks = false;
 			if (jsonObject.has("XOffSet"))
 				xoff = jsonObject.get("XOffSet").getAsInt();
-			
+
 			if (jsonObject.has("YOffSet"))
 				yoff = jsonObject.get("YOffSet").getAsInt();
-			
+
 			if (jsonObject.has("ZOffSet"))
 				zoff = jsonObject.get("ZOffSet").getAsInt();
-			
+
 			if (jsonObject.has("delay"))
 				delay = jsonObject.get("delay").getAsFloat();
-			
+
 			if (jsonObject.has("falling"))
 				falling = jsonObject.get("falling").getAsBoolean();
-			
+
 			if (jsonObject.has("RelativeToPlayer"))
 				relativeToPlayer = jsonObject.get("RelativeToPlayer").getAsBoolean();
-			
+
 			if (jsonObject.has("IncludeAirBlocks"))
 				includeAirBlocks = jsonObject.get("IncludeAirBlocks").getAsBoolean();
-			
+
 			CustomSchematic schematic = null;
 			if (fileName.endsWith(".ccs"))
 				schematic = SchematicUtil.loadCustomSchematic(fileName, xoff, yoff, zoff, delay, falling, relativeToPlayer, includeAirBlocks);
 			else if (fileName.endsWith(".schematic"))
 				schematic = SchematicUtil.loadLegacySchematic(fileName, xoff, yoff, zoff, delay, falling, relativeToPlayer, includeAirBlocks);
-			
+
 			if (schematic == null)
 				CCubesCore.instance().getLogger().log(Level.WARNING, "Failed to load a schematic reward with the file name " + fileName);
 			else
 				rewards.add(new SchematicRewardType(schematic));
 		});
-		
+
 		return rewards;
 	}
-	
+
 	// TODO client sided only?
 	/*
 	 * public List<IRewardType> loadSoundReward(JsonArray rawReward,
@@ -677,7 +681,7 @@ public class CustomRewardsLoader
 	 * rewards.add(new SoundRewardType(sounds.toArray(new
 	 * SoundPart[sounds.size()]))); return rewards; }
 	 */
-	
+
 	public SimpleEntry<BasicReward, Boolean> parseReward(Entry<String, JsonElement> reward)
 	{
 		List<IRewardType> rewards = new ArrayList<>();
@@ -727,7 +731,7 @@ public class CustomRewardsLoader
 			{
 				isGiantCubeReward = rewardElement.getValue().getAsBoolean();
 			}
-			
+
 			try
 			{
 				JsonArray rewardTypes = rewardElement.getValue().getAsJsonArray();
@@ -762,10 +766,10 @@ public class CustomRewardsLoader
 				CCubesCore.instance().getLogger().log(Level.WARNING, ex.getMessage());
 			}
 		}
-		
+
 		return new SimpleEntry<>(new BasicReward(reward.getKey(), chance, rewards.toArray(new IRewardType[rewards.size()])), isGiantCubeReward);
 	}
-	
+
 	public String removedKeyQuotes(String raw)
 	{
 		StringBuilder sb = new StringBuilder(raw);

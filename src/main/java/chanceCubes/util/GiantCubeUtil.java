@@ -1,39 +1,36 @@
 package chanceCubes.util;
 
-import chanceCubes.sounds.CCubesSounds;
-import chanceCubes.tileentities.TileGiantCube;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import chanceCubes.CCubesCore;
+import chanceCubes.items.CCubesItems;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.metadata.FixedMetadataValue;
 
 public class GiantCubeUtil {
 
     /**
      * Check that structure is properly formed
      *
-     * @param xCoord
-     * @param yCoord
-     * @param zCoord
-     * @param world
+     * @param location
      * @param build  if the giant cube should be built if the structure is valid
      * @return if there is a valid 3x3x3 configuration
      */
-    public static boolean checkMultiBlockForm(BlockPos pos, World world, boolean build) {
-        BlockPos bottomLeft = findBottomCorner(pos, world);
-        int cx = bottomLeft.getX();
-        int cy = bottomLeft.getY();
-        int cz = bottomLeft.getZ();
+    public static boolean checkMultiBlockForm(Location location, boolean build) {
+        Location bottomLeft = findBottomCorner(location);
+        int cx = bottomLeft.getBlockX();
+        int cy = bottomLeft.getBlockY();
+        int cz = bottomLeft.getBlockZ();
         int i = 0;
         // Scan a 3x3x3 area, starting with the bottom left corner
         for (int x = cx; x < cx + 3; x++)
             for (int y = cy; y < cy + 3; y++)
                 for (int z = cz; z < cz + 3; z++)
-                    if (world.getBlockState(new BlockPos(x, y, z)).getBlock().equals(CCubesBlocks.CHANCE_CUBE))
+                    if (CCubesItems.isChanceCube(new Location(location.getWorld(), x, y, z).getBlock()))
                         i++;
         // check if there are 27 blocks present (3*3*3) and if a giant cube should be built
         if (build) {
             if (i > 26) {
-                setupStructure(new BlockPos(cx, cy, cz), world, true);
+                setupStructure(new Location(location.getWorld(), cx, cy, cz), true);
                 return true;
             }
             return false;
@@ -43,92 +40,77 @@ public class GiantCubeUtil {
         }
     }
 
-    public static BlockPos findBottomCorner(BlockPos pos, World world) {
-        int cx = pos.getX();
-        int cy = pos.getY();
-        int cz = pos.getZ();
-        while (world.getBlockState(pos.add(0, -1, 0)).getBlock().equals(CCubesBlocks.CHANCE_CUBE)) {
-            pos = pos.add(0, -1, 0);
+    public static Location findBottomCorner(Location location) {
+        int cx = location.getBlockX();
+        int cy = location.getBlockY();
+        int cz = location.getBlockZ();
+        Location tempLoc = location.clone().subtract(0, 1, 0);
+        while (CCubesItems.isChanceCube(tempLoc.getBlock())) {
+            tempLoc.subtract(0, 1, 0);
             cy--;
         }
-        while (world.getBlockState(pos.add(-1, 0, 0)).getBlock().equals(CCubesBlocks.CHANCE_CUBE)) {
-            pos = pos.add(-1, 0, 0);
+
+        tempLoc.subtract(1, 0, 0);
+        while (CCubesItems.isChanceCube(tempLoc.getBlock())) {
+            tempLoc.subtract(1, 0, 0);
             cx--;
         }
-        while (world.getBlockState(pos.add(0, 0, -1)).getBlock().equals(CCubesBlocks.CHANCE_CUBE)) {
-            pos = pos.add(0, 0, -1);
+
+        tempLoc.subtract(0, 0, 1);
+        while (CCubesItems.isChanceCube(tempLoc.getBlock())) {
+            tempLoc.subtract(0, 0, 1);
             cz--;
         }
 
-        return new BlockPos(cx, cy, cz);
+        return new Location(location.getWorld(), cx, cy, cz);
     }
 
     /**
      * Reset all the parts of the structure
      */
-    public static void removeStructure(BlockPos pos, World world) {
-        for (int x = pos.getX() - 1; x < pos.getX() + 2; x++)
-            for (int y = pos.getY() - 1; y < pos.getY() + 2; y++)
-                for (int z = pos.getZ() - 1; z < pos.getZ() + 2; z++) {
-                    BlockPos blockPos = new BlockPos(x, y, z);
-                    TileEntity tile = world.getTileEntity(blockPos);
-                    if (tile != null && (tile instanceof TileGiantCube)) {
-                        ((TileGiantCube) tile).reset();
-                        world.removeTileEntity(blockPos);
-                        world.setBlockToAir(blockPos);
-                    }
-                }
+    public static void removeStructure(Location location) {
+        for (int x = location.getBlockX() - 1; x < location.getBlockX() + 2; x++)
+            for(int y = location.getBlockY() - 1; y < location.getBlockY() + 2; y++)
+                for(int z = location.getBlockZ() - 1; z < location.getBlockZ() + 2; z++)
+                    new Location(location.getWorld(), x, y, z).getBlock().setType(Material.AIR);
     }
 
     /**
      * Reset all the parts of the structure
      */
-    public static void resetStructure(BlockPos pos, World world) {
-        for (int x = pos.getX() - 1; x < pos.getX() + 2; x++)
-            for (int y = pos.getY() - 1; y < pos.getY() + 2; y++)
-                for (int z = pos.getZ() - 1; z < pos.getZ() + 2; z++) {
-                    BlockPos blockPos = new BlockPos(x, y, z);
-                    TileEntity tile = world.getTileEntity(blockPos);
-                    if (tile != null && (tile instanceof TileGiantCube)) {
-                        ((TileGiantCube) tile).reset();
-                        world.removeTileEntity(blockPos);
-                        world.setBlockState(blockPos, CCubesBlocks.CHANCE_CUBE.getDefaultState());
-                    }
-                }
+    public static void resetStructure(Location location) {
+        for (int x = location.getBlockX() - 1; x < location.getBlockX() + 2; x++)
+            for (int y = location.getBlockY() - 1; y < location.getBlockY() + 2; y++)
+                for (int z = location.getBlockZ() - 1; z < location.getBlockZ() + 2; z++)
+                    new Location(location.getWorld(), x, y, z).getBlock().setType(Material.AIR);
     }
 
     /**
      * Setup all the blocks in the structure
      */
-    public static void setupStructure(BlockPos pos, World world, boolean areCoordsCorrect) {
-        int cx = pos.getX();
-        int cy = pos.getY();
-        int cz = pos.getZ();
+    public static void setupStructure(Location location, boolean areCoordsCorrect) {
+        int cx = location.getBlockX();
+        int cy = location.getBlockY();
+        int cz = location.getBlockZ();
 
         if (!areCoordsCorrect) {
-            BlockPos bottomLeft = findBottomCorner(pos, world);
-            cx = bottomLeft.getX();
-            cy = bottomLeft.getY();
-            cz = bottomLeft.getZ();
+            Location bottomLeft = findBottomCorner(location);
+            cx = bottomLeft.getBlockX();
+            cy = bottomLeft.getBlockY();
+            cz = bottomLeft.getBlockZ();
         }
 
-        int i = 0;
         for (int x = cx; x < cx + 3; x++) {
             for (int z = cz; z < cz + 3; z++) {
                 for (int y = cy; y < cy + 3; y++) {
-                    i++;
-                    RewardsUtil.placeBlock(CCubesBlocks.GIANT_CUBE.getDefaultState(), world, new BlockPos(x, y, z), i == 27 ? 3 : 2);
-                    TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
-                    // Check if block is bottom center block
-                    boolean master = (x == cx && y == cy + 1 && z == cz);
-                    if (tile != null && (tile instanceof TileGiantCube)) {
-                        ((TileGiantCube) tile).setMasterCoords(cx + 1, cy + 1, cz + 1);
-                        ((TileGiantCube) tile).setHasMaster(true);
-                        ((TileGiantCube) tile).setIsMaster(master);
-                    }
+                    Location loc = new Location(location.getWorld(), x, y, z);
+                    RewardsUtil.placeBlock(CCubesItems.giantChanceCube.getType(), loc);
+                    loc.getBlock().setMetadata("ChanceCubes", new FixedMetadataValue(CCubesCore.instance(), "\\_o<"));
                 }
             }
         }
-        world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), CCubesSounds.GIANT_CUBE_SPAWN.getSoundEvent(), CCubesSounds.GIANT_CUBE_SPAWN.getSoundCategory(), 1.0F, 1.0F);
+
+        //TODO no custom sounds available yet
+        //world.playSound(null, location.getBlockX(), location.getBlockY(), location.getBlockZ(), CCubesSounds.GIANT_CUBE_SPAWN.getSoundEvent(), CCubesSounds.GIANT_CUBE_SPAWN.getSoundCategory(), 1.0F, 1.0F);
     }
 }

@@ -27,7 +27,7 @@ public class ClearInventoryReward implements IChanceCubeReward {
         final ItemStack[] inv = player.getInventory().getContents().clone();
         for (int slotNum = 0; slotNum < player.getInventory().getSize(); slotNum++) {
             ItemStack itemStack = player.getInventory().getItem(slotNum);
-            if (itemStack != null && CCubesItems.isChanceCube(itemStack))
+            if (itemStack != null && CCubesItems.isGenericChanceCube(itemStack))
                 cubes = true;
             else
                 player.getInventory().setItem(slotNum, null);

@@ -1,10 +1,11 @@
 package chanceCubes.items;
 
+import chanceCubes.CCubesCore;
 import chanceCubes.config.CCubesSettings;
 import java.util.Arrays;
-import net.minecraft.server.v1_10_R1.Block;
+import java.util.stream.Collectors;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -43,11 +44,6 @@ public class CCubesItems {
         ItemStack clone = itemStack.clone();
         clone.setAmount(amount);
         return clone;
-    }
-
-    public static Block getBlockOf(ItemStack itemStack) {
-        net.minecraft.server.v1_10_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-        return Block.asBlock(nmsStack.getItem());
     }
 
     private static ItemStack chancePendant(int tier, int chanceBonus) {
@@ -195,7 +191,11 @@ public class CCubesItems {
         mesher.register(CCubesItems.scanner, 0, new ModelResourceLocation(CCubesCore.MODID + ":" + CCubesItems.scanner.getItemName(), "inventory"));*/
     }
 
-    public static boolean isChanceCube(ItemStack itemStack) {
+    public static boolean isGenericChanceCube(ItemStack itemStack) {
         return itemStack.isSimilar(chanceCube) || itemStack.isSimilar(chanceIcosahedron) || itemStack.isSimilar(giantChanceCube);
+    }
+
+    public static boolean isChanceCube(Block block) {
+        return block.getType() == chanceCube.getType() && !block.getMetadata("ChanceCubes").stream().filter(data -> data.getOwningPlugin() != CCubesCore.instance()).collect(Collectors.toList()).isEmpty();
     }
 }

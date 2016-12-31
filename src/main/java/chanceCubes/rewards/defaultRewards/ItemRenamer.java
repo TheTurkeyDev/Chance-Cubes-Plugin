@@ -1,6 +1,7 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
+import chanceCubes.achievement.CCubesAchievements;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -51,8 +52,7 @@ public class ItemRenamer implements IChanceCubeReward {
             meta.setDisplayName("A lonely piece of dirt");
             dirt.setItemMeta(meta);
             player.getWorld().dropItem(player.getLocation(), dirt);
-            //TODO working on custom achievements
-            //player.addStat(CCubesAchievements.lonelyDirt);
+            CCubesAchievements.award(player, CCubesAchievements.lonelyDirt);
             return;
         }
 

@@ -1,6 +1,7 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
+import chanceCubes.achievement.CCubesAchievements;
 import chanceCubes.util.RewardsUtil;
 import java.util.Random;
 import org.bukkit.Bukkit;
@@ -47,9 +48,8 @@ public class WitherReward implements IChanceCubeReward {
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(CCubesCore.instance(), () -> {
             removeEnts(wither);
-            //TODO need to work on custom Achievements
-            /*if (!removeEnts(wither))
-                player.awardAchievement(CCubesAchievements.wither);*/
+            if (!removeEnts(wither))
+                CCubesAchievements.award(player, CCubesAchievements.wither);
         }, 180);
     }
 

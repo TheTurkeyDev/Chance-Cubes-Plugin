@@ -1,5 +1,6 @@
 package chanceCubes;
 
+import chanceCubes.achievement.CCubesAchievements;
 import chanceCubes.commands.CCubesServerCommands;
 import chanceCubes.config.CCubesSettings;
 import chanceCubes.config.ConfigLoader;
@@ -21,14 +22,10 @@ public class CCubesCore extends JavaPlugin {
     public void onEnable() {
         //Load
         ConfigLoader.loadConfigSettings();
-
-        //TODO custom blocks not possible w/o client mods
-        //CCubesBlocks.loadBlocks();
         CCubesItems.loadItems();
         //TODO Code for Packet Handling being moved to server only
         //CCubesPacketHandler.init();
-        //TODO May keep these as custom Achievements
-        //CCubesAchievements.loadAchievements();
+        CCubesAchievements.loadAchievements();
 
         getServer().getPluginManager().registerEvents(new PlayerConnectListener(), this);
         getServer().getPluginManager().registerEvents(new WorldGen(), this);
@@ -53,8 +50,6 @@ public class CCubesCore extends JavaPlugin {
         //CCubesSounds.loadSounds();
 
         CCubesItems.registerItems();
-        //TODO custom blocks not possible w/o client mods
-        //CCubesBlocks.registerBlocksItems();
 
         //TODO rendering is client sided
         //proxy.registerRenderings();

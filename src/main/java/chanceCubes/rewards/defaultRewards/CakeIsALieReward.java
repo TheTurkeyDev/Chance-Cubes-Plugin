@@ -1,6 +1,7 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
+import chanceCubes.achievement.CCubesAchievements;
 import chanceCubes.util.RewardsUtil;
 import java.util.Random;
 import org.bukkit.Location;
@@ -52,8 +53,7 @@ public class CakeIsALieReward implements IChanceCubeReward {
 
             creeper.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 9999, 2));
             creeper.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 999));
-            //TODO need to work on custom achievements
-            //player.addStat(CCubesAchievements.itsALie);
+            CCubesAchievements.award(player, CCubesAchievements.itsALie);
             return;
         }
 

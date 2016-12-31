@@ -66,6 +66,12 @@ public class CCubesCore extends JavaPlugin {
         getCommand(getId()).setExecutor(new CCubesServerCommands());
     }
 
+    @Override
+    public void onDisable()
+    {
+        CCubesAchievements.save();
+    }
+
     public static CCubesCore instance() {
         return getPlugin(CCubesCore.class);
     }

@@ -97,7 +97,7 @@ public class CustomRewardsLoader
 	{
 		List<String> rewardinfo = Lists.newArrayList();
 
-		File rewardsFile = new File(this.folder.getPath() + "\\" + file);
+		File rewardsFile = new File(folder, file);
 		JsonElement fileJson;
 
 		try
@@ -116,6 +116,7 @@ public class CustomRewardsLoader
 			for (Entry<String, JsonElement> rewardElement : rewardElements.entrySet())
 				rewardinfo.add(rewardElement.getKey());
 		}
+
 		return rewardinfo;
 	}
 

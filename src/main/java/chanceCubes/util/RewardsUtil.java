@@ -133,11 +133,6 @@ public class RewardsUtil {
         return ores.get(rand.nextInt(ores.size()));
     }
 
-    //TODO OreDictionary and Fluid Registry not a thing in Vanilla
-    /*public static String getRandomOreDict() {
-        return RewardsUtil.getOreDicts().get(rand.nextInt(RewardsUtil.getOreDicts().size()));
-    }*/
-
     public static ItemStack getSpawnEggForMob(String entity) {
         net.minecraft.server.v1_10_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(new ItemStack(Material.MONSTER_EGGS));
         NBTTagCompound tag = nmsStack.hasTag() ? nmsStack.getTag() : new NBTTagCompound();
@@ -148,32 +143,12 @@ public class RewardsUtil {
         return CraftItemStack.asBukkitCopy(nmsStack);
     }
 
-    public static void initData() {
-        //TODO OreDictionary and Fluid Registry not a thing in Vanilla
-        /*oredicts.add("oreGold");
-        oredicts.add("oreIron");
-        oredicts.add("oreLapis");
-        oredicts.add("oreDiamond");
-        oredicts.add("oreRedstone");
-        oredicts.add("oreEmerald");
-        oredicts.add("oreQuartz");
-        oredicts.add("oreCoal");
-
-        for (String oreDict : possibleModOres)
-            if (OreDictionary.doesOreNameExist(oreDict))
-                oredicts.add(oreDict);
-
-        for (String s : FluidRegistry.getRegisteredFluids().keySet())
-            fluids.add(s);*/
-    }
-
     public static boolean isBlockUnbreakable(Location location) {
         net.minecraft.server.v1_10_R1.World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition pos = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         return world.c(pos).b(world, pos) == -1;
     }
 
-    //TODO need to create a method that id's blocks as chance blocks
     public static boolean placeBlock(Material material, Location location) {
         return placeBlock(material, new MaterialData(material), location);
     }

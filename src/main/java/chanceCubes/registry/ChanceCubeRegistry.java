@@ -109,8 +109,6 @@ public class ChanceCubeRegistry implements IRewardRegistry {
      * loads the default rewards of the Chance Cube
      */
     public static void loadDefaultRewards() {
-        RewardsUtil.initData();
-
         if (!CCubesSettings.enableHardCodedRewards)
             return;
 

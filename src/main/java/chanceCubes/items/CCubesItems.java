@@ -175,7 +175,6 @@ public class CCubesItems {
 
     //TODO when creating block in world, use something that can be dug by hand but still requires silk touch
     //TODO when creating block, make it only breakable by the "Silk Touch Pendant"
-    //TODO client side rendering for items not needed but kept just in case.
     public static boolean isGenericChanceCube(ItemStack itemStack) {
         return itemStack.isSimilar(chanceCube) || itemStack.isSimilar(chanceIcosahedron) || itemStack.isSimilar(giantChanceCube);
     }

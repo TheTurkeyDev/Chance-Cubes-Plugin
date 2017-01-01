@@ -6,7 +6,7 @@ import com.google.gson.JsonParser;
 import java.io.BufferedInputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import org.apache.logging.log4j.Level;
+import java.util.logging.Level;
 
 public class HTTPUtil {
 
@@ -25,7 +25,7 @@ public class HTTPUtil {
         int responseCode = con.getResponseCode();
 
         if (responseCode != HttpURLConnection.HTTP_OK && responseCode != HttpURLConnection.HTTP_MOVED_PERM)
-            CCubesCore.logger.log(Level.WARN, "Update request returned response code: " + responseCode + " " + con.getResponseMessage());
+            CCubesCore.instance().getLogger().log(Level.WARNING, "Update request returned response code: " + responseCode + " " + con.getResponseMessage());
         else if (responseCode == HttpURLConnection.HTTP_MOVED_PERM)
             throw new Exception();
 

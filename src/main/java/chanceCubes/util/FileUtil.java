@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.annotation.Nonnull;
@@ -73,7 +74,7 @@ public class FileUtil {
             file.delete();
         }
         catch (Exception e) {
-            CCubesCore.logger.error("Deleting file " + file.getAbsolutePath() + " failed.");
+            CCubesCore.instance().getLogger().log(Level.SEVERE, "Deleting file " + file.getAbsolutePath() + " failed.");
         }
     }
 
@@ -83,7 +84,7 @@ public class FileUtil {
             FileUtils.deleteDirectory(file);
         }
         catch (Exception e) {
-            CCubesCore.logger.error("Deleting directory " + file.getAbsolutePath() + " failed.");
+            CCubesCore.instance().getLogger().log(Level.SEVERE, "Deleting directory " + file.getAbsolutePath() + " failed.");
         }
     }
 

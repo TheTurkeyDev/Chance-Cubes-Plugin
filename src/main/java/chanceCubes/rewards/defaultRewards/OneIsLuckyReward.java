@@ -1,7 +1,9 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
+import chanceCubes.blocks.CCubesBlocks;
 import chanceCubes.items.CCubesItems;
+import chanceCubes.tileentities.ChanceCubeData;
 import chanceCubes.util.RewardsUtil;
 import java.util.Random;
 import org.bukkit.Bukkit;
@@ -11,7 +13,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
-import org.bukkit.metadata.FixedMetadataValue;
 
 public class OneIsLuckyReward implements IChanceCubeReward {
 
@@ -31,10 +32,9 @@ public class OneIsLuckyReward implements IChanceCubeReward {
     public void trigger(final Location location, final Player player) {
         RewardsUtil.sendMessageToNearPlayers(location, 32, "A Lucky Block Salute");
         boolean leftLucky = random.nextBoolean();
-        if (RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), new MaterialData(CCubesItems.chanceCube.getType()), location.clone().add(-1, 0, 0))) {
-            BlockState chanceCube = location.clone().add(-1, 0, 0).getBlock().getState();
-            chanceCube.setMetadata("ChanceCubes-Chance", new FixedMetadataValue(CCubesCore.instance(), leftLucky ? 100 : -100));
-            chanceCube.update(true);
+        Location left = location.clone().subtract(1, 0, 0);
+        if (RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), new MaterialData(CCubesItems.chanceCube.getType()), left)) {
+            CCubesBlocks.addChanceCube(new ChanceCubeData(left, leftLucky ? 100 : -100));
         }
 
         if (RewardsUtil.placeBlock(Material.SIGN_POST, new org.bukkit.material.Sign(), location)) {
@@ -45,10 +45,9 @@ public class OneIsLuckyReward implements IChanceCubeReward {
             sign.update(true);
         }
 
-        if (RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), new MaterialData(CCubesItems.chanceCube.getType()), location.clone().add(-1, 0, 0))) {
-            BlockState chanceCube = location.clone().add(-1, 0, 0).getBlock().getState();
-            chanceCube.setMetadata("ChanceCubes-Chance", new FixedMetadataValue(CCubesCore.instance(), !leftLucky ? 100 : -100));
-            chanceCube.update(true);
+        Location right = location.clone().add(1, 0, 0);
+        if (RewardsUtil.placeBlock(CCubesItems.chanceCube.getType(), new MaterialData(CCubesItems.chanceCube.getType()), right)) {
+            CCubesBlocks.addChanceCube(new ChanceCubeData(left, !leftLucky ? 100 : -100));
         }
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(CCubesCore.instance(), () -> update(0, location), 10);

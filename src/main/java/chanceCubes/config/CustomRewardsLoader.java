@@ -723,8 +723,10 @@ public class CustomRewardsLoader
 						}
 					}
 				}
+
 				if (!gameversion && mcversionused)
 					return null;
+
 				continue;
 			}
 			else if (rewardElement.getKey().equalsIgnoreCase("isGiantCubeReward"))

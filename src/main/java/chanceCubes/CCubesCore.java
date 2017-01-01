@@ -1,12 +1,14 @@
 package chanceCubes;
 
 import chanceCubes.achievement.CCubesAchievements;
+import chanceCubes.blocks.CCubesBlocks;
 import chanceCubes.commands.CCubesServerCommands;
 import chanceCubes.config.CCubesSettings;
 import chanceCubes.config.ConfigLoader;
 import chanceCubes.config.CustomRewardsLoader;
 import chanceCubes.hookins.ModHookUtil;
 import chanceCubes.items.CCubesItems;
+import chanceCubes.listeners.BlockListener;
 import chanceCubes.listeners.PlayerConnectListener;
 import chanceCubes.listeners.WorldGen;
 import chanceCubes.registry.ChanceCubeRegistry;
@@ -23,10 +25,9 @@ public class CCubesCore extends JavaPlugin {
         //Load
         ConfigLoader.loadConfigSettings();
         CCubesItems.loadItems();
-        //TODO Code for Packet Handling being moved to server only
-        //CCubesPacketHandler.init();
         CCubesAchievements.loadAchievements();
 
+        getServer().getPluginManager().registerEvents(new BlockListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerConnectListener(), this);
         getServer().getPluginManager().registerEvents(new WorldGen(), this);
 
@@ -49,11 +50,6 @@ public class CCubesCore extends JavaPlugin {
         //TODO client side only
         //CCubesSounds.loadSounds();
 
-        CCubesItems.registerItems();
-
-        //TODO rendering is client sided
-        //proxy.registerRenderings();
-
         //Post Init
         ChanceCubeRegistry.loadDefaultRewards();
         GiantCubeRegistry.loadDefaultRewards();
@@ -62,6 +58,7 @@ public class CCubesCore extends JavaPlugin {
         CustomRewardsLoader.instance.loadDisabledRewards();
 
         //Server Load
+        CCubesBlocks.load();
         ModHookUtil.loadCustomModRewards();
         getCommand(getId()).setExecutor(new CCubesServerCommands());
     }
@@ -70,6 +67,7 @@ public class CCubesCore extends JavaPlugin {
     public void onDisable()
     {
         CCubesAchievements.save();
+        CCubesBlocks.save();
     }
 
     public static CCubesCore instance() {

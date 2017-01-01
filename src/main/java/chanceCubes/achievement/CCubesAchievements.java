@@ -51,7 +51,8 @@ public class CCubesAchievements {
             }
             catch(IOException e)
             {
-                e.printStackTrace();
+                CCubesCore.instance().getLogger().log(Level.WARNING, "An error occurred while creating achievements.yml");
+                return;
             }
         }
 

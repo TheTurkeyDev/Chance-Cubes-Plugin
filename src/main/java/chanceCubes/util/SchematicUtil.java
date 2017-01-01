@@ -85,7 +85,6 @@ public class SchematicUtil {
                     }
 
                     blocks.add(id);
-                    //TODO left off here
                     TileEntity te = world.getTileEntity(pos);
                     if (te != null) {
                         NBTTagCompound nbt = te.save(new NBTTagCompound());

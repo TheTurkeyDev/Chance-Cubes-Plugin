@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import net.minecraft.server.v1_10_R1.BlockPosition;
 import net.minecraft.server.v1_10_R1.Item;
 import net.minecraft.server.v1_10_R1.MinecraftKey;
 import net.minecraft.server.v1_10_R1.NBTTagCompound;
@@ -18,10 +19,10 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
-import org.bukkit.metadata.MetadataValue;
 
 public class RewardsUtil {
 
@@ -167,12 +168,9 @@ public class RewardsUtil {
     }
 
     public static boolean isBlockUnbreakable(Location location) {
-        List<MetadataValue> metadata = location.getBlock().getMetadata("ChanceCubes-Unbreakable");
-        boolean isUnbreakable = false;
-        for (MetadataValue meta : metadata)
-            isUnbreakable = meta.asBoolean();
-
-        return isUnbreakable;
+        net.minecraft.server.v1_10_R1.World world = ((CraftWorld) location.getWorld()).getHandle();
+        BlockPosition pos = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return world.c(pos).b(world, pos) == -1;
     }
 
     //TODO need to create a method that id's blocks as chance blocks

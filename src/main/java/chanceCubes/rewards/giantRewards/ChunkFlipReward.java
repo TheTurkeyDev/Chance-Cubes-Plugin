@@ -1,6 +1,7 @@
 package chanceCubes.rewards.giantRewards;
 
 import chanceCubes.CCubesCore;
+import chanceCubes.blocks.CCubesBlocks;
 import chanceCubes.rewards.defaultRewards.IChanceCubeReward;
 import chanceCubes.util.RewardsUtil;
 import org.bukkit.Location;
@@ -36,7 +37,7 @@ public class ChunkFlipReward implements IChanceCubeReward {
                 Location pos2 = new Location(world, x + xx, world.getMaxHeight() - y, z + zz);
                 BlockState b = pos1.getBlock().getState();
                 BlockState b2 = pos2.getBlock().getState();
-                if (b.getBlock().getType() != Material.GRAVEL && b.getMetadata("ChanceCubes").size() > 0) {
+                if (b.getBlock().getType() != Material.GRAVEL && !CCubesBlocks.isChanceCube(b.getBlock())) {
                     Material material2 = b.getType();
                     MaterialData materialData1 = b.getData();
                     Material material1 = b2.getType();

@@ -47,8 +47,6 @@ public class CCubesCore extends JavaPlugin {
 
         //Init
         CCubesRecipes.loadRecipes();
-        //TODO client side only
-        //CCubesSounds.loadSounds();
 
         //Post Init
         ChanceCubeRegistry.loadDefaultRewards();

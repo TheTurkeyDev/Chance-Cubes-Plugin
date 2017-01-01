@@ -70,14 +70,6 @@ public class CustomRewardsLoader
 		instance = this;
 		this.folder = folder;
 		json = new JsonParser();
-
-		// Custom Sounds not possible
-		/*
-		 * CustomSoundsLoader customSounds = new CustomSoundsLoader(folder, new
-		 * File(folder.getAbsolutePath() + "/CustomSounds-Resourcepack"),
-		 * "Chance Cubes Resource Pack"); customSounds.addCustomSounds();
-		 * customSounds.assemble();
-		 */
 	}
 
 	public int compareDates(Calendar first, Calendar second)
@@ -656,32 +648,6 @@ public class CustomRewardsLoader
 		return rewards;
 	}
 
-	// TODO client sided only?
-	/*
-	 * public List<IRewardType> loadSoundReward(JsonArray rawReward,
-	 * List<IRewardType> rewards) { List<SoundPart> sounds = new ArrayList<>();
-	 * for (JsonElement element : rawReward) { SoundPart sound = new
-	 * SoundPart(CCubesSounds.registerSound(element.getAsJsonObject().get(
-	 * "sound").getAsString())); if (element.getAsJsonObject().has("delay"))
-	 * sound.setDelay(element.getAsJsonObject().get("delay").getAsInt()); if
-	 * (element.getAsJsonObject().has("serverWide"))
-	 * sound.setServerWide(element.getAsJsonObject().get("serverWide").
-	 * getAsBoolean()); if (element.getAsJsonObject().has("range"))
-	 * sound.setRange(element.getAsJsonObject().get("range").getAsInt()); if
-	 * (element.getAsJsonObject().has("playAtPlayersLocation"))
-	 * sound.setAtPlayersLocation(element.getAsJsonObject().get(
-	 * "playAtPlayersLocation").getAsBoolean()); if
-	 * (element.getAsJsonObject().has("volume"))
-	 * sound.setVolume(element.getAsJsonObject().get("volume").getAsInt()); if
-	 * (element.getAsJsonObject().has("pitch"))
-	 * sound.setPitch(element.getAsJsonObject().get("pitch").getAsInt());
-	 * 
-	 * sounds.add(sound); }
-	 * 
-	 * rewards.add(new SoundRewardType(sounds.toArray(new
-	 * SoundPart[sounds.size()]))); return rewards; }
-	 */
-
 	public SimpleEntry<BasicReward, Boolean> parseReward(Entry<String, JsonElement> reward)
 	{
 		List<IRewardType> rewards = new ArrayList<>();
@@ -753,10 +719,6 @@ public class CustomRewardsLoader
 					this.loadPotionReward(rewardTypes, rewards);
 				else if (rewardElement.getKey().equalsIgnoreCase("Schematic"))
 					this.loadSchematicReward(rewardTypes, rewards);
-				/*
-				 * else if (rewardElement.getKey().equalsIgnoreCase("Sound"))
-				 * this.loadSoundReward(rewardTypes, rewards);
-				 */
 				else if (rewardElement.getKey().equalsIgnoreCase("Chest"))
 					this.loadChestReward(rewardTypes, rewards);
 				else if (rewardElement.getKey().equalsIgnoreCase("Particle"))

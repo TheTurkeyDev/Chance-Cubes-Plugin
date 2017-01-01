@@ -4,7 +4,7 @@ import org.bukkit.Sound;
 
 public class SoundPart {
 
-    public static String[] elements = new String[]{"sound:S", "delay:I", "serverWide:B", "range:I"};
+    public static String[] elements = new String[]{"delay:I", "serverWide:B", "range:I"};
     private boolean atPlayersLocation = false;
     private int delay = 0;
     private int pitch = 1;

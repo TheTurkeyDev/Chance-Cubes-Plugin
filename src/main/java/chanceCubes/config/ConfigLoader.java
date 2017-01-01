@@ -49,8 +49,6 @@ public class ConfigLoader {
         customConfigFolder.mkdirs();
 
         new File(folder, "Schematics").mkdirs();
-        new File(folder, "Sounds").mkdirs();
-
         new CustomRewardsLoader(customConfigFolder);
     }
     

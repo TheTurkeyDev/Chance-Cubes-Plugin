@@ -1,7 +1,9 @@
 package chanceCubes.rewards.defaultRewards;
 
 import chanceCubes.CCubesCore;
+import chanceCubes.blocks.CCubesBlocks;
 import chanceCubes.items.CCubesItems;
+import chanceCubes.tileentities.ChanceD20Data;
 import chanceCubes.util.RewardsUtil;
 import java.util.Random;
 import org.bukkit.DyeColor;
@@ -40,7 +42,9 @@ public class DiscoReward implements IChanceCubeReward {
             sheep.setCustomNameVisible(true);
         }
 
-        RewardsUtil.placeBlock(CCubesItems.chanceIcosahedron.getType(), new MaterialData(CCubesItems.chanceIcosahedron.getType()), location.clone().add(0, 3, 0));
+        if (RewardsUtil.placeBlock(CCubesItems.chanceIcosahedron.getType(), new MaterialData(CCubesItems.chanceIcosahedron.getType()), location.clone().add(0, 3, 0)))
+            CCubesBlocks.addChanceD20(new ChanceD20Data(location));
+
         RewardsUtil.sendMessageToNearPlayers(location, 32, "Disco Party!!!!");
     }
 }

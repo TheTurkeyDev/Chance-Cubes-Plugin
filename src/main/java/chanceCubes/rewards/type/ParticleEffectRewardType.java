@@ -12,7 +12,6 @@ public class ParticleEffectRewardType extends BaseRewardType<ParticlePart> {
 
     @Override
     public void trigger(ParticlePart part, Location location, Player player) {
-        //TODO when parsing Particle, need to refer to CraftParticle and EnumParticle
         location.getWorld().spawnParticle(part.getParticle(), location.clone().add(Math.random(), Math.random(), Math.random()), 1);
     }
 }

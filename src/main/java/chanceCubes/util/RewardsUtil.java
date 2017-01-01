@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import net.minecraft.server.v1_10_R1.BlockPosition;
 import net.minecraft.server.v1_10_R1.Item;
 import net.minecraft.server.v1_10_R1.MinecraftKey;
 import net.minecraft.server.v1_10_R1.NBTTagCompound;
@@ -18,10 +19,10 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
+import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
-import org.bukkit.metadata.MetadataValue;
 
 public class RewardsUtil {
 
@@ -132,11 +133,6 @@ public class RewardsUtil {
         return ores.get(rand.nextInt(ores.size()));
     }
 
-    //TODO OreDictionary and Fluid Registry not a thing in Vanilla
-    /*public static String getRandomOreDict() {
-        return RewardsUtil.getOreDicts().get(rand.nextInt(RewardsUtil.getOreDicts().size()));
-    }*/
-
     public static ItemStack getSpawnEggForMob(String entity) {
         net.minecraft.server.v1_10_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(new ItemStack(Material.MONSTER_EGGS));
         NBTTagCompound tag = nmsStack.hasTag() ? nmsStack.getTag() : new NBTTagCompound();
@@ -147,35 +143,12 @@ public class RewardsUtil {
         return CraftItemStack.asBukkitCopy(nmsStack);
     }
 
-    public static void initData() {
-        //TODO OreDictionary and Fluid Registry not a thing in Vanilla
-        /*oredicts.add("oreGold");
-        oredicts.add("oreIron");
-        oredicts.add("oreLapis");
-        oredicts.add("oreDiamond");
-        oredicts.add("oreRedstone");
-        oredicts.add("oreEmerald");
-        oredicts.add("oreQuartz");
-        oredicts.add("oreCoal");
-
-        for (String oreDict : possibleModOres)
-            if (OreDictionary.doesOreNameExist(oreDict))
-                oredicts.add(oreDict);
-
-        for (String s : FluidRegistry.getRegisteredFluids().keySet())
-            fluids.add(s);*/
-    }
-
     public static boolean isBlockUnbreakable(Location location) {
-        List<MetadataValue> metadata = location.getBlock().getMetadata("ChanceCubes-Unbreakable");
-        boolean isUnbreakable = false;
-        for (MetadataValue meta : metadata)
-            isUnbreakable = meta.asBoolean();
-
-        return isUnbreakable;
+        net.minecraft.server.v1_10_R1.World world = ((CraftWorld) location.getWorld()).getHandle();
+        BlockPosition pos = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return world.c(pos).b(world, pos) == -1;
     }
 
-    //TODO need to create a method that id's blocks as chance blocks
     public static boolean placeBlock(Material material, Location location) {
         return placeBlock(material, new MaterialData(material), location);
     }

@@ -1,11 +1,8 @@
 package chanceCubes.items;
 
-import chanceCubes.CCubesCore;
 import chanceCubes.config.CCubesSettings;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -178,24 +175,7 @@ public class CCubesItems {
 
     //TODO when creating block in world, use something that can be dug by hand but still requires silk touch
     //TODO when creating block, make it only breakable by the "Silk Touch Pendant"
-    //TODO client side rendering for items not needed but kept just in case.
-    public static void registerItems() {
-        /*ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
-
-        mesher.register(CCubesItems.silkPendant, 0, new ModelResourceLocation(CCubesCore.MODID + ":" + CCubesItems.silkPendant.getItemName(), "inventory"));
-        mesher.register(CCubesItems.chancePendantT1, 0, new ModelResourceLocation(CCubesCore.MODID + ":" + CCubesItems.chancePendantT1.getItemName(), "inventory"));
-        mesher.register(CCubesItems.chancePendantT2, 0, new ModelResourceLocation(CCubesCore.MODID + ":" + CCubesItems.chancePendantT2.getItemName(), "inventory"));
-        mesher.register(CCubesItems.chancePendantT3, 0, new ModelResourceLocation(CCubesCore.MODID + ":" + CCubesItems.chancePendantT3.getItemName(), "inventory"));
-        mesher.register(CCubesItems.creativePendant, 0, new ModelResourceLocation(CCubesCore.MODID + ":" + CCubesItems.creativePendant.getItemName(), "inventory"));
-        mesher.register(CCubesItems.rewardSelectorPendant, 0, new ModelResourceLocation(CCubesCore.MODID + ":" + CCubesItems.rewardSelectorPendant.getItemName(), "inventory"));
-        mesher.register(CCubesItems.scanner, 0, new ModelResourceLocation(CCubesCore.MODID + ":" + CCubesItems.scanner.getItemName(), "inventory"));*/
-    }
-
     public static boolean isGenericChanceCube(ItemStack itemStack) {
         return itemStack.isSimilar(chanceCube) || itemStack.isSimilar(chanceIcosahedron) || itemStack.isSimilar(giantChanceCube);
-    }
-
-    public static boolean isChanceCube(Block block) {
-        return block.getType() == chanceCube.getType() && !block.getMetadata("ChanceCubes").stream().filter(data -> data.getOwningPlugin() != CCubesCore.instance()).collect(Collectors.toList()).isEmpty();
     }
 }

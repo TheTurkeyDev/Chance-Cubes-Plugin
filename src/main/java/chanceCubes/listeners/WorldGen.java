@@ -1,8 +1,9 @@
 package chanceCubes.listeners;
 
-import chanceCubes.CCubesCore;
+import chanceCubes.blocks.CCubesBlocks;
 import chanceCubes.config.CCubesSettings;
 import chanceCubes.items.CCubesItems;
+import chanceCubes.tileentities.ChanceCubeData;
 import java.util.Random;
 import net.minecraft.server.v1_10_R1.BlockPosition;
 import net.minecraft.server.v1_10_R1.Blocks;
@@ -17,11 +18,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.generator.BlockPopulator;
-import org.bukkit.metadata.FixedMetadataValue;
 
 public class WorldGen implements Listener {
 
-    //TODO left off here. looking into block population
     @EventHandler
     public void onGenerate(WorldInitEvent event) {
         World world = event.getWorld();
@@ -71,9 +70,8 @@ public class WorldGen implements Listener {
 
                 BlockState state = world.getBlockAt(new Location(world, x, y, z)).getState();
                 state.setType(CCubesItems.chanceCube.getType());
-                //TODO need this to possibly return another volume
-                state.setMetadata("ChanceCubes", new FixedMetadataValue(CCubesCore.instance(), "Test"));
                 state.update(true);
+                CCubesBlocks.addChanceCube(new ChanceCubeData(state.getLocation()));
             }
         }
     }

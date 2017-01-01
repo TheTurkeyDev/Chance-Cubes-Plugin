@@ -109,8 +109,6 @@ public class ChanceCubeRegistry implements IRewardRegistry {
      * loads the default rewards of the Chance Cube
      */
     public static void loadDefaultRewards() {
-        RewardsUtil.initData();
-
         if (!CCubesSettings.enableHardCodedRewards)
             return;
 
@@ -162,7 +160,6 @@ public class ChanceCubeRegistry implements IRewardRegistry {
         INSTANCE.registerReward(new BasicReward(CCubesCore.instance().getId() + ":chanceCube_Cube", -10, new MessageRewardType(new MessagePart("Hey, at least it isn't a Giant Chance Cube >:)")), new BlockRewardType(new OffsetBlock(-1, 0, -1, CCubesItems.chanceCube.getType(), false), new OffsetBlock(-1, 0, -2, CCubesItems.chanceCube.getType(), false), new OffsetBlock(-2, 0, -1, CCubesItems.chanceCube.getType(), false), new OffsetBlock(-2, 0, -2, CCubesItems.chanceCube.getType(), false), new OffsetBlock(-1, 1, -1, CCubesItems.chanceCube.getType(), false), new OffsetBlock(-1, 1, -2, CCubesItems.chanceCube.getType(), false), new OffsetBlock(-2, 1, -1, CCubesItems.chanceCube.getType(), false), new OffsetBlock(-2, 1, -2, CCubesItems.chanceCube.getType(), false))));
         INSTANCE.registerReward(new BasicReward(CCubesCore.instance().getId() + ":Fake_TNT", 0, new SoundRewardType(new SoundPart(Sound.ENTITY_TNT_PRIMED), new SoundPart(Sound.ENTITY_TNT_PRIMED), new SoundPart(Sound.ENTITY_TNT_PRIMED), new SoundPart(Sound.ENTITY_GENERIC_EXPLODE).setDelay(120).setAtPlayersLocation(true))));
         INSTANCE.registerReward(new BasicReward(CCubesCore.instance().getId() + ":Invisible_Ghasts", 0, new SoundRewardType(new SoundPart(Sound.ENTITY_GHAST_SCREAM).setServerWide(true), new SoundPart(Sound.ENTITY_GHAST_WARN).setServerWide(true), new SoundPart(Sound.ENTITY_GHAST_WARN).setServerWide(true))));
-        //TODO left off here. need to get nms block version of items because of shenanigans
         INSTANCE.registerReward(new BasicReward(CCubesCore.instance().getId() + ":No", 0, new BlockRewardType(new OffsetBlock(0, 0, 0, CCubesItems.chanceCube.getType(), false)), new MessageRewardType(new MessagePart("No"))));
         INSTANCE.registerReward(new BasicReward(CCubesCore.instance().getId() + ":Invisible_Creeper", -30, new CommandRewardType(new CommandPart("/summon Creeper %x %y %z {ActiveEffects:[{Id:14,Amplifier:0,Duration:200,ShowParticles:0b}]}"))));
         INSTANCE.registerReward(new BasicReward(CCubesCore.instance().getId() + ":Knockback_Zombie", -35, new CommandRewardType(new CommandPart("/summon Zombie ~ ~1 ~ {CustomName:\"Leonidas\",CustomNameVisible:1,IsVillager:0,IsBaby:1,HandItems:[{id:stick,Count:1,tag:{AttributeModifiers:[{AttributeName:\"generic.knockbackResistance\",Name:\"generic.knockbackResistance\",Amount:100,Operation:0,UUIDLeast:724513,UUIDMost:715230}],ench:[{id:19,lvl:100}],display:{Name:\"The Spartan Kick\"}}},{}],HandDropChances:[0.0F,0.085F],ActiveEffects:[{Id:1,Amplifier:5,Duration:199980,ShowParticles:0b},{Id:8,Amplifier:2,Duration:199980}]}"))));

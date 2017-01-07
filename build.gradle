@@ -13,7 +13,7 @@ else
     logger.lifecycle "No build number detected, setting to 0"
 
 group "chanceCubes.CCubesCore"
-version project.mod_version
+version= "${mc_version}-${mod_version}.${buildnumber}"
 
 repositories {
     mavenCentral()
